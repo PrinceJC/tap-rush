@@ -1,14 +1,19 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <meta charset="UTF-8">
 
     <title>Tap Rush</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
+
 
 <body>
 
@@ -18,51 +23,113 @@
 
         <p>Tap as fast as you can!</p>
 
+
+        <!-- ========================================
+             GAME STATS
+        ========================================= -->
+
         <div class="stats">
 
             <div class="stat">
+
                 <span>TIME</span>
-                <strong id="time">10</strong>
+
+                <strong id="time">20</strong>
+
             </div>
 
+
             <div class="stat">
+
                 <span>SCORE</span>
+
                 <strong id="score">0</strong>
+
             </div>
 
+
             <div class="stat">
+
                 <span>BEST</span>
+
                 <strong id="best">0</strong>
+
             </div>
 
         </div>
 
 
-        <button id="startButton" class="start-button">
+        <!-- ========================================
+             COMBO DISPLAY
+        ========================================= -->
+
+        <div id="comboDisplay">
+            🔥 COMBO x0
+        </div>
+
+
+        <!-- ========================================
+             START BUTTON
+        ========================================= -->
+
+        <button id="startButton"
+                class="start-button">
+
             START GAME
+
         </button>
 
 
-        <button id="tapButton" class="tap-button" disabled>
+        <!-- ========================================
+             TAP BUTTON
+        ========================================= -->
+
+        <button id="tapButton"
+                class="tap-button"
+                disabled>
+
             TAP!
+
         </button>
 
 
-        <div id="message" class="message"></div>
+        <!-- ========================================
+             MESSAGE
+        ========================================= -->
+
+        <div id="message"
+             class="message">
+        </div>
 
 
-        <button id="shareButton" class="share-button" style="display:none;">
+        <!-- ========================================
+             SHARE BUTTON
+        ========================================= -->
+
+        <button id="shareButton"
+                class="share-button"
+                style="display:none;">
+
             📤 SHARE SCORE
+
         </button>
 
+
+        <!-- ========================================
+             LEADERBOARD
+        ========================================= -->
 
         <div class="leaderboard">
 
-          <h2>🔥 Today's Leaderboard</h2>
-                <p id="challengeDate"></p>
+            <h2>🔥 Today's Leaderboard</h2>
+
+            <p id="challengeDate"></p>
+
 
             <div id="leaderboardList">
+
                 Loading leaderboard...
+
             </div>
 
         </div>
@@ -70,11 +137,19 @@
     </div>
 
 
-    <!-- Supabase -->
+    <!-- ========================================
+         SUPABASE
+    ========================================= -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Game -->
+
+    <!-- ========================================
+         GAME
+    ========================================= -->
+
     <script src="game.js"></script>
 
 </body>
+
 </html>

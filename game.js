@@ -13,6 +13,7 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_Kl_qSSKNGYVlGMwRR7PiZA_RstX8Ug9";
 
+
 const supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
@@ -28,6 +29,16 @@ let score = 0;
 let timeLeft = 20;
 let gameRunning = false;
 let timer = null;
+
+
+// ========================================
+// COMBO SYSTEM
+// ========================================
+
+let combo = 0;
+let comboTimer = null;
+
+const COMBO_TIMEOUT = 1000;
 
 
 // ========================================
@@ -92,6 +103,9 @@ const leaderboardList =
 const challengeDate =
     document.getElementById("challengeDate");
 
+const comboDisplay =
+    document.getElementById("comboDisplay");
+
 
 // ========================================
 // INITIAL DISPLAY
@@ -99,6 +113,14 @@ const challengeDate =
 
 bestDisplay.textContent =
     bestScore;
+
+
+if (comboDisplay) {
+
+    comboDisplay.textContent =
+        "🔥 COMBO x0";
+
+}
 
 
 if (challengeDate) {
@@ -151,6 +173,34 @@ function startGame() {
     gameRunning = true;
 
 
+    // Reset combo
+
+    combo = 0;
+
+
+    if (comboTimer) {
+
+        clearTimeout(
+            comboTimer
+        );
+
+        comboTimer = null;
+
+    }
+
+
+    if (comboDisplay) {
+
+        comboDisplay.textContent =
+            "🔥 COMBO x0";
+
+        comboDisplay.classList.remove(
+            "combo-pop"
+        );
+
+    }
+
+
     scoreDisplay.textContent =
         score;
 
@@ -165,11 +215,13 @@ function startGame() {
 
     tapButton.disabled = false;
 
+
     shareButton.style.display =
         "none";
 
 
-    // Prepare audio after user interaction
+    // Prepare audio
+
     initAudio();
 
 
@@ -202,21 +254,128 @@ function tap() {
     }
 
 
-    score++;
+    // ========================================
+    // SCORE
+    // ========================================
 
+    score++;
 
     scoreDisplay.textContent =
         score;
 
 
-    // Visual tap effect
+    // ========================================
+    // COMBO
+    // ========================================
+
+    combo++;
+
+
+    if (comboDisplay) {
+
+        comboDisplay.textContent =
+            `🔥 COMBO x${combo}`;
+
+
+        // Pop animation
+
+        comboDisplay.classList.remove(
+            "combo-pop"
+        );
+
+
+        // Force browser to restart animation
+
+        void comboDisplay.offsetWidth;
+
+
+        comboDisplay.classList.add(
+            "combo-pop"
+        );
+
+
+        // ========================================
+        // COMBO MILESTONE EFFECTS
+        // ========================================
+
+        if (
+            combo === 5 ||
+            combo === 10 ||
+            combo === 20
+        ) {
+
+            comboDisplay.classList.remove(
+                "combo-milestone"
+            );
+
+
+            // Force browser to restart animation
+
+            void comboDisplay.offsetWidth;
+
+
+            comboDisplay.classList.add(
+                "combo-milestone"
+            );
+
+        }
+
+    }
+
+
+    // ========================================
+    // RESET COMBO TIMER
+    // ========================================
+
+    if (comboTimer) {
+
+        clearTimeout(
+            comboTimer
+        );
+
+    }
+
+
+    comboTimer =
+        setTimeout(() => {
+
+            combo = 0;
+
+
+            if (comboDisplay) {
+
+                comboDisplay.textContent =
+                    "🔥 COMBO x0";
+
+
+                comboDisplay.classList.remove(
+                    "combo-pop"
+                );
+
+
+                comboDisplay.classList.remove(
+                    "combo-milestone"
+                );
+
+            }
+
+        }, COMBO_TIMEOUT);
+
+
+    // ========================================
+    // TAP EFFECT
+    // ========================================
+
     createTapEffect();
 
 
-    // Tap sound
-    playTapSound();
-}
+    // ========================================
+    // TAP SOUND
+    // ========================================
 
+    playTapSound();
+
+}
 
 // ========================================
 // INITIALIZE AUDIO
@@ -395,6 +554,7 @@ function createTapEffect() {
     }, 700);
 }
 
+
 // ========================================
 // GAME OVER SOUND
 // ========================================
@@ -405,46 +565,60 @@ function playGameOverSound() {
 
         initAudio();
 
+
         if (!audioContext) {
             return;
         }
 
+
         const oscillator =
             audioContext.createOscillator();
+
 
         const gain =
             audioContext.createGain();
 
+
         oscillator.type =
             "sine";
+
 
         oscillator.frequency.setValueAtTime(
             350,
             audioContext.currentTime
         );
 
+
         oscillator.frequency.exponentialRampToValueAtTime(
             180,
             audioContext.currentTime + 0.25
         );
+
 
         gain.gain.setValueAtTime(
             0.08,
             audioContext.currentTime
         );
 
+
         gain.gain.exponentialRampToValueAtTime(
             0.001,
             audioContext.currentTime + 0.25
         );
 
-        oscillator.connect(gain);
+
+        oscillator.connect(
+            gain
+        );
+
 
         gain.connect(
             audioContext.destination
         );
 
+
         oscillator.start();
+
 
         oscillator.stop(
             audioContext.currentTime + 0.25
@@ -471,80 +645,110 @@ function playNewRecordSound() {
 
         initAudio();
 
+
         if (!audioContext) {
             return;
         }
+
 
         const now =
             audioContext.currentTime;
 
 
         // First note
+
         const oscillator1 =
             audioContext.createOscillator();
+
 
         const gain1 =
             audioContext.createGain();
 
+
         oscillator1.type =
             "sine";
 
+
         oscillator1.frequency.value =
             600;
+
 
         gain1.gain.setValueAtTime(
             0.08,
             now
         );
 
+
         gain1.gain.exponentialRampToValueAtTime(
             0.001,
             now + 0.12
         );
 
-        oscillator1.connect(gain1);
+
+        oscillator1.connect(
+            gain1
+        );
+
 
         gain1.connect(
             audioContext.destination
         );
 
-        oscillator1.start(now);
 
-        oscillator1.stop(now + 0.12);
+        oscillator1.start(
+            now
+        );
+
+
+        oscillator1.stop(
+            now + 0.12
+        );
 
 
         // Second note
+
         const oscillator2 =
             audioContext.createOscillator();
+
 
         const gain2 =
             audioContext.createGain();
 
+
         oscillator2.type =
             "sine";
 
+
         oscillator2.frequency.value =
             900;
+
 
         gain2.gain.setValueAtTime(
             0.08,
             now + 0.12
         );
 
+
         gain2.gain.exponentialRampToValueAtTime(
             0.001,
             now + 0.30
         );
 
-        oscillator2.connect(gain2);
+
+        oscillator2.connect(
+            gain2
+        );
+
 
         gain2.connect(
             audioContext.destination
         );
 
+
         oscillator2.start(
             now + 0.12
         );
+
 
         oscillator2.stop(
             now + 0.30
@@ -559,6 +763,8 @@ function playNewRecordSound() {
 
     }
 }
+
+
 // ========================================
 // END GAME
 // ========================================
@@ -569,6 +775,32 @@ async function endGame() {
 
 
     clearInterval(timer);
+
+
+    if (comboTimer) {
+
+        clearTimeout(
+            comboTimer
+        );
+
+        comboTimer = null;
+
+    }
+
+
+    combo = 0;
+
+
+    if (comboDisplay) {
+
+        comboDisplay.textContent =
+            "🔥 COMBO x0";
+
+        comboDisplay.classList.remove(
+            "combo-pop"
+        );
+
+    }
 
 
     tapButton.disabled = true;
@@ -582,33 +814,43 @@ async function endGame() {
 
     if (score > bestScore) {
 
-    bestScore = score;
+        bestScore = score;
 
-    localStorage.setItem(
-        "tapRushBest",
-        bestScore
-    );
 
-    bestDisplay.textContent =
-        bestScore;
+        localStorage.setItem(
+            "tapRushBest",
+            bestScore
+        );
 
-    message.textContent =
-        `🎉 NEW RECORD! ${score} taps!`;
 
-    initAudio();
+        bestDisplay.textContent =
+            bestScore;
 
-    setTimeout(() => {
-        playNewRecordSound();
-    }, 50);
 
-} else {
+        message.textContent =
+            `🎉 NEW RECORD! ${score} taps!`;
 
-    message.textContent =
-        `Game Over! ${score} taps.`;
 
-    playGameOverSound();
+        // Give audio time to resume
 
-}
+        initAudio();
+
+
+        setTimeout(() => {
+
+            playNewRecordSound();
+
+        }, 50);
+
+    } else {
+
+        message.textContent =
+            `Game Over! ${score} taps.`;
+
+
+        playGameOverSound();
+
+    }
 
 
     shareButton.style.display =
@@ -652,7 +894,6 @@ async function submitScore() {
         }
 
 
-        // Clean nickname
         playerName =
             playerName
                 .trim()
@@ -664,7 +905,6 @@ async function submitScore() {
         }
 
 
-        // Save nickname
         localStorage.setItem(
             "tapRushPlayerName",
             playerName
@@ -734,6 +974,7 @@ async function submitScore() {
 
 
         // Only update if new score is higher
+
         if (score > existingPlayer.score) {
 
             const {
@@ -1033,8 +1274,8 @@ async function showPlayerRank(
         playerIndex + 1;
 
 
-   message.textContent =
-    `🏆 You're #${rank} today with ${score} taps!`;
+    message.textContent =
+        `🏆 You're #${rank} today with ${score} taps!`;
 }
 
 
