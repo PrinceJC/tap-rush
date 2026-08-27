@@ -4,7 +4,7 @@
 
 
 // ========================================
-// SUPABASE
+// SUPABASE CONNECTION
 // ========================================
 
 const SUPABASE_URL =
@@ -76,7 +76,7 @@ bestDisplay.textContent = bestScore;
 
 
 // ========================================
-// BUTTONS
+// BUTTON EVENTS
 // ========================================
 
 startButton.addEventListener(
@@ -108,9 +108,11 @@ function startGame() {
     gameRunning = true;
 
 
-    scoreDisplay.textContent = score;
+    scoreDisplay.textContent =
+        score;
 
-    timeDisplay.textContent = timeLeft;
+    timeDisplay.textContent =
+        timeLeft;
 
 
     message.textContent = "";
@@ -120,7 +122,8 @@ function startGame() {
 
     tapButton.disabled = false;
 
-    shareButton.style.display = "none";
+    shareButton.style.display =
+        "none";
 
 
     timer = setInterval(() => {
@@ -177,7 +180,9 @@ async function endGame() {
     startButton.disabled = false;
 
 
+    // ========================================
     // PERSONAL BEST
+    // ========================================
 
     if (score > bestScore) {
 
@@ -209,15 +214,13 @@ async function endGame() {
         "block";
 
 
-    // SUBMIT SCORE
-
+    // Save score to Supabase
     await submitScore();
-
 }
 
 
 // ========================================
-// SUBMIT SCORE TO SUPABASE
+// SUBMIT / UPDATE SCORE
 // ========================================
 
 async function submitScore() {
@@ -229,12 +232,11 @@ async function submitScore() {
 
 
     if (!playerName) {
-
         return;
-
     }
 
 
+    // Clean nickname
     playerName =
         playerName
             .trim()
@@ -242,67 +244,164 @@ async function submitScore() {
 
 
     if (!playerName) {
-
         return;
-
     }
 
 
     console.log(
-        "Submitting score...",
-        playerName,
-        score
+        "Checking player:",
+        playerName
     );
 
 
+    // ========================================
+    // CHECK IF PLAYER ALREADY EXISTS
+    // ========================================
+
     const {
-        data,
-        error
+        data: existingPlayer,
+        error: findError
     } =
         await supabaseClient
             .from("leaderboard")
-            .insert([
-                {
-                    player_name:
-                        playerName,
+            .select(
+                "id, player_name, score"
+            )
+            .eq(
+                "player_name",
+                playerName
+            )
+            .maybeSingle();
 
-                    score:
-                        score
-                }
-            ]);
 
-
-    if (error) {
+    if (findError) {
 
         console.error(
-            "SUPABASE ERROR:",
-            error
+            "Error checking player:",
+            findError
         );
 
 
         alert(
-            "Could not submit score. Check the browser console."
+            "Unable to check your leaderboard score."
         );
 
 
         return;
+    }
+
+
+    // ========================================
+    // EXISTING PLAYER
+    // ========================================
+
+    if (existingPlayer) {
+
+        console.log(
+            "Existing best:",
+            existingPlayer.score
+        );
+
+
+        // Only update if the new score is higher
+        if (score > existingPlayer.score) {
+
+            const {
+                error: updateError
+            } =
+                await supabaseClient
+                    .from("leaderboard")
+                    .update({
+                        score: score
+                    })
+                    .eq(
+                        "id",
+                        existingPlayer.id
+                    );
+
+
+            if (updateError) {
+
+                console.error(
+                    "Update error:",
+                    updateError
+                );
+
+
+                alert(
+                    "Unable to update your score."
+                );
+
+
+                return;
+            }
+
+
+            message.textContent =
+                `🏆 New leaderboard record! ${score} taps!`;
+
+        } else {
+
+            message.textContent =
+                `Your score: ${score}. Your best: ${existingPlayer.score}`;
+
+        }
 
     }
 
 
-    console.log(
-        "Score submitted successfully!",
-        data
-    );
+    // ========================================
+    // NEW PLAYER
+    // ========================================
+
+    else {
+
+        const {
+            error: insertError
+        } =
+            await supabaseClient
+                .from("leaderboard")
+                .insert([
+                    {
+                        player_name:
+                            playerName,
+
+                        score:
+                            score
+                    }
+                ]);
 
 
+        if (insertError) {
+
+            console.error(
+                "Insert error:",
+                insertError
+            );
+
+
+            alert(
+                "Unable to submit your score."
+            );
+
+
+            return;
+        }
+
+
+        message.textContent =
+            `🎉 You're on the leaderboard with ${score}!`;
+
+    }
+
+
+    // Refresh leaderboard
     loadLeaderboard();
-
 }
 
 
 // ========================================
-// LOAD LEADERBOARD
+// LOAD GLOBAL LEADERBOARD
 // ========================================
 
 async function loadLeaderboard() {
@@ -332,7 +431,7 @@ async function loadLeaderboard() {
     if (error) {
 
         console.error(
-            "LEADERBOARD ERROR:",
+            "Leaderboard error:",
             error
         );
 
@@ -340,8 +439,8 @@ async function loadLeaderboard() {
         leaderboardList.innerHTML =
             "Unable to load leaderboard.";
 
-        return;
 
+        return;
     }
 
 
@@ -350,13 +449,12 @@ async function loadLeaderboard() {
         leaderboardList.innerHTML =
             "No scores yet. Be the first!";
 
-        return;
 
+        return;
     }
 
 
-    leaderboardList.innerHTML =
-        "";
+    leaderboardList.innerHTML = "";
 
 
     data.forEach(
@@ -374,7 +472,7 @@ async function loadLeaderboard() {
 
             row.innerHTML = `
                 <span>
-                    ${index + 1}. 
+                    ${index + 1}.
                     ${escapeHTML(player.player_name)}
                 </span>
 
@@ -390,28 +488,31 @@ async function loadLeaderboard() {
 
         }
     );
-
 }
 
 
 // ========================================
-// SECURITY
+// PROTECT LEADERBOARD DISPLAY
 // ========================================
 
 function escapeHTML(text) {
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
-    div.textContent = text;
+
+    div.textContent =
+        text;
+
 
     return div.innerHTML;
-
 }
 
 
 // ========================================
-// SHARE
+// SHARE SCORE
 // ========================================
 
 async function shareScore() {
@@ -424,6 +525,7 @@ async function shareScore() {
         window.location.href;
 
 
+    // Mobile native share
     if (navigator.share) {
 
         try {
@@ -452,14 +554,13 @@ async function shareScore() {
             ) {
 
                 return;
-
             }
 
         }
-
     }
 
 
+    // Clipboard fallback
     try {
 
         await navigator.clipboard.writeText(
@@ -480,12 +581,11 @@ async function shareScore() {
         );
 
     }
-
 }
 
 
 // ========================================
-// LOAD LEADERBOARD WHEN GAME OPENS
+// LOAD LEADERBOARD WHEN PAGE OPENS
 // ========================================
 
 loadLeaderboard();
