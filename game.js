@@ -25,7 +25,7 @@ const supabaseClient =
 // ========================================
 
 let score = 0;
-let timeLeft = 10;
+let timeLeft = 20;
 let gameRunning = false;
 let timer = null;
 
@@ -146,7 +146,7 @@ function startGame() {
 
     score = 0;
 
-    timeLeft = 10;
+    timeLeft = 20;
 
     gameRunning = true;
 
