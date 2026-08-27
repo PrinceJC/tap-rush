@@ -1,0 +1,223 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    user-select: none;
+}
+
+/* MAIN GAME AREA */
+
+.game-container {
+    width: 100%;
+    max-width: 480px;
+
+    padding: 20px;
+}
+
+/* GAME CARD */
+
+.game-card {
+    background: white;
+
+    border-radius: 25px;
+
+    padding: 30px 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.10);
+}
+
+/* TITLE */
+
+h1 {
+    font-size: 42px;
+
+    margin-bottom: 8px;
+}
+
+/* INSTRUCTIONS */
+
+.instructions {
+    font-size: 17px;
+
+    margin-bottom: 25px;
+}
+
+/* SCORE AREA */
+
+.game-info {
+    display: flex;
+
+    justify-content: space-around;
+
+    margin-bottom: 30px;
+}
+
+.game-info div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.game-info span {
+    font-size: 13px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+.game-info strong {
+    font-size: 30px;
+}
+
+/* TAP BUTTON */
+
+.tap-button {
+    width: min(70vw, 280px);
+
+    height: min(70vw, 280px);
+
+    border: none;
+
+    border-radius: 50%;
+
+    font-size: 42px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    touch-action: manipulation;
+
+    transition: transform 0.08s;
+}
+
+/* TAP ANIMATION */
+
+.tap-button:active {
+    transform: scale(0.92);
+}
+
+/* DISABLED TAP BUTTON */
+
+.tap-button:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+/* START BUTTON */
+
+.start-button {
+    display: block;
+
+    margin: 25px auto 0;
+
+    padding: 15px 35px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    touch-action: manipulation;
+}
+
+/* START BUTTON CLICK */
+
+.start-button:active {
+    transform: scale(0.96);
+}
+
+/* DISABLED START BUTTON */
+
+.start-button:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+/* GAME MESSAGE */
+
+#message {
+    min-height: 30px;
+
+    margin-top: 20px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+/* SHARE BUTTON */
+
+.share-button {
+    margin: 15px auto 0;
+
+    padding: 14px 25px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    touch-action: manipulation;
+}
+
+/* SHARE BUTTON CLICK */
+
+.share-button:active {
+    transform: scale(0.96);
+}
+
+/* MOBILE SCREEN */
+
+@media (max-width: 400px) {
+
+    .game-container {
+        padding: 15px;
+    }
+
+    .game-card {
+        padding: 25px 15px;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
+
+    .instructions {
+        font-size: 15px;
+    }
+
+    .game-info strong {
+        font-size: 26px;
+    }
+}
