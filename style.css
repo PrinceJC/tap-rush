@@ -1,6 +1,6 @@
 /* ========================================
    TAP RUSH
-   MODERN GAME DESIGN
+   PROFESSIONAL GAME UI
 ======================================== */
 
 * {
@@ -9,17 +9,18 @@
     padding: 0;
 }
 
+
+/* ========================================
+   BODY
+======================================== */
+
 body {
     min-height: 100vh;
 
-    font-family: Arial, sans-serif;
-
-    background:
-        radial-gradient(
-            circle at top,
-            #252552,
-            #0d0d1c 65%
-        );
+    font-family:
+        Inter,
+        Arial,
+        sans-serif;
 
     color: white;
 
@@ -30,6 +31,35 @@ body {
     padding: 20px;
 
     overflow-x: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            rgba(100, 90, 255, 0.35),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 10% 80%,
+            rgba(0, 200, 255, 0.10),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 90% 70%,
+            rgba(150, 60, 255, 0.10),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #080812,
+            #111126 50%,
+            #07070f
+        );
+
+    background-attachment: fixed;
+
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
 }
 
 
@@ -38,10 +68,36 @@ body {
 ======================================== */
 
 .game-container {
+
     width: 100%;
-    max-width: 500px;
+
+    max-width: 520px;
 
     text-align: center;
+
+    position: relative;
+
+    padding: 28px 20px;
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.08),
+            rgba(255,255,255,0.025)
+        );
+
+    border:
+        1px solid rgba(255,255,255,0.10);
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(18px);
+
+    -webkit-backdrop-filter: blur(18px);
 }
 
 
@@ -50,386 +106,116 @@ body {
 ======================================== */
 
 h1 {
+
     font-size: 3rem;
 
     font-weight: 900;
 
-    letter-spacing: 3px;
+    letter-spacing: 4px;
 
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #a9a4ff
+        );
+
+    -webkit-background-clip: text;
+
+    background-clip: text;
+
+    color: transparent;
 
     text-shadow:
-        0 0 10px rgba(255, 255, 255, 0.4);
+        0 10px 30px rgba(120,100,255,0.25);
 }
 
-.subtitle {
-    opacity: 0.7;
 
-    margin-bottom: 25px;
+.game-container > p {
+
+    font-size: 0.95rem;
+
+    color: rgba(255,255,255,0.58);
+
+    margin-bottom: 24px;
 }
 
 
 /* ========================================
-   SCORE AREA
+   STATS
 ======================================== */
 
-.score-board {
+.stats {
+
     display: flex;
 
     justify-content: space-between;
 
     gap: 10px;
 
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
-.score-box {
+
+.stat {
+
     flex: 1;
 
+    padding: 14px 8px;
+
+    border-radius: 16px;
+
     background:
-        rgba(255, 255, 255, 0.08);
+        rgba(255,255,255,0.055);
 
     border:
-        1px solid rgba(255, 255, 255, 0.12);
-
-    border-radius: 18px;
-
-    padding: 15px 10px;
-
-    backdrop-filter: blur(10px);
+        1px solid rgba(255,255,255,0.08);
 
     box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.25);
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 8px 20px rgba(0,0,0,0.18);
 }
 
-.score-label {
+
+.stat span {
+
     display: block;
 
-    font-size: 0.75rem;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-
-    opacity: 0.6;
-
-    margin-bottom: 5px;
-}
-
-.score-value {
-    font-size: 2rem;
-
-    font-weight: 900;
-}
-
-
-/* ========================================
-   GAME AREA
-======================================== */
-
-.game-area {
-    position: relative;
-
-    margin: 20px 0;
-}
-
-
-/* ========================================
-   TAP BUTTON
-======================================== */
-
-#tapButton {
-    width: 220px;
-    height: 220px;
-
-    border: none;
-
-    border-radius: 50%;
-
-    touch-action: manipulation;
-
-    -webkit-tap-highlight-color: transparent;
-
-    user-select: none;
-
-    -webkit-user-select: none;
-
-    background:
-        radial-gradient(
-            circle at 35% 30%,
-            #ffffff,
-            #ddddff 25%,
-            #7d6cff 60%,
-            #4a3aff
-        );
-
-    color: #15152b;
-
-    font-size: 2rem;
-
-    font-weight: 900;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 0 0 10px rgba(125, 108, 255, 0.15),
-        0 0 50px rgba(125, 108, 255, 0.5),
-        inset 0 -15px 25px rgba(0, 0, 0, 0.15);
-
-    transition:
-        transform 0.08s ease,
-        box-shadow 0.08s ease;
-}
-
-
-/* ========================================
-   TAP ANIMATION
-======================================== */
-
-#tapButton:active {
-    transform: scale(0.90);
-
-    box-shadow:
-        0 0 0 5px rgba(125, 108, 255, 0.2),
-        0 0 25px rgba(125, 108, 255, 0.4),
-        inset 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-
-/* ========================================
-   PULSE ANIMATION
-======================================== */
-
-@keyframes pulse {
-
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.04);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-#tapButton:not(:disabled) {
-    animation: pulse 1.5s infinite;
-}
-
-
-/* ========================================
-   DISABLED BUTTON
-======================================== */
-
-#tapButton:disabled {
-    opacity: 0.35;
-
-    cursor: not-allowed;
-
-    animation: none;
-}
-
-
-/* ========================================
-   START BUTTON
-======================================== */
-
-#startButton {
-    border: none;
-
-    padding: 14px 30px;
-
-    border-radius: 12px;
-
-    background: white;
-
-    color: #15152b;
-
-    font-size: 1rem;
+    font-size: 0.68rem;
 
     font-weight: 800;
 
-    cursor: pointer;
+    letter-spacing: 1.5px;
 
-    transition:
-        transform 0.15s ease,
-        opacity 0.15s ease;
-}
+    color:
+        rgba(255,255,255,0.45);
 
-#startButton:hover {
-    transform: translateY(-2px);
-}
-
-#startButton:active {
-    transform: scale(0.95);
-}
-
-#startButton:disabled {
-    opacity: 0.5;
-
-    cursor: not-allowed;
-}
-
-
-/* ========================================
-   MESSAGE
-======================================== */
-
-#message {
-    min-height: 30px;
-
-    margin: 18px 0;
-
-    font-weight: 700;
-
-    font-size: 1.05rem;
-}
-
-
-/* ========================================
-   SHARE BUTTON
-======================================== */
-
-#shareButton {
-    border: none;
-
-    padding: 12px 24px;
-
-    border-radius: 12px;
-
-    background:
-        rgba(255, 255, 255, 0.1);
-
-    color: white;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.2);
-
-    cursor: pointer;
-
-    font-weight: 700;
-
-    transition:
-        background 0.15s ease,
-        transform 0.15s ease;
-}
-
-#shareButton:hover {
-    background:
-        rgba(255, 255, 255, 0.18);
-
-    transform: translateY(-2px);
-}
-
-
-/* ========================================
-   LEADERBOARD
-======================================== */
-
-.leaderboard {
-    margin-top: 30px;
-
-    padding: 20px;
-
-    background:
-        rgba(255, 255, 255, 0.06);
-
-    border:
-        1px solid rgba(255, 255, 255, 0.1);
-
-    border-radius: 20px;
-
-    backdrop-filter: blur(10px);
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
-.leaderboard h2 {
     margin-bottom: 5px;
-
-    font-size: 1.3rem;
-}
-
-#challengeDate {
-    opacity: 0.55;
-
-    font-size: 0.85rem;
-
-    margin-bottom: 15px;
 }
 
 
-/* ========================================
-   LEADERBOARD ROW
-======================================== */
+.stat strong {
 
-.leaderboard-row {
-    display: flex;
+    display: block;
 
-    justify-content: space-between;
-
-    align-items: center;
-
-    padding: 12px 10px;
-
-    border-bottom:
-        1px solid rgba(255, 255, 255, 0.08);
-
-    font-weight: 700;
-}
-
-.leaderboard-row:last-child {
-    border-bottom: none;
-}
-
-.leaderboard-row strong {
-    font-size: 1.1rem;
-}
-
-
-/* ========================================
-   TAP +1 EFFECT
-======================================== */
-
-.tap-effect {
-    position: absolute;
-
-    transform:
-        translate(-50%, -50%);
-
-    font-size: 1.5rem;
+    font-size: 1.8rem;
 
     font-weight: 900;
 
-    pointer-events: none;
-
-    animation:
-        tapFloat 0.7s ease-out forwards;
-
-    z-index: 10;
+    line-height: 1;
 }
 
-@keyframes tapFloat {
 
-    0% {
-        opacity: 1;
+/* ========================================
+   TIMER
+======================================== */
 
-        transform:
-            translate(-50%, -20%)
-            scale(1);
-    }
+#time {
 
-    100% {
-        opacity: 0;
-
-        transform:
-            translate(-50%, -120px)
-            scale(1.4);
-    }
+    transition:
+        transform 0.15s ease;
 }
 
 
@@ -438,13 +224,22 @@ h1 {
 ======================================== */
 
 #comboDisplay {
-    margin: 12px 0;
 
-    font-size: 20px;
+    min-height: 30px;
 
-    font-weight: bold;
+    margin: 14px 0;
 
-    text-align: center;
+    font-size: 1.15rem;
+
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    color:
+        rgba(255,255,255,0.9);
+
+    text-shadow:
+        0 4px 15px rgba(255,120,50,0.25);
 
     transition:
         transform 0.12s ease;
@@ -452,10 +247,11 @@ h1 {
 
 
 /* ========================================
-   NORMAL COMBO POP
+   COMBO POP
 ======================================== */
 
 .combo-pop {
+
     transform:
         scale(1.25);
 }
@@ -466,15 +262,16 @@ h1 {
 ======================================== */
 
 .combo-milestone {
+
     animation:
         comboMilestone 0.5s ease;
 }
 
+
 @keyframes comboMilestone {
 
     0% {
-        transform:
-            scale(1);
+        transform: scale(1);
     }
 
     30% {
@@ -492,7 +289,737 @@ h1 {
     100% {
         transform:
             scale(1)
-            rotate(0deg);
+            rotate(0);
+    }
+}
+
+
+/* ========================================
+   START BUTTON
+======================================== */
+
+#startButton {
+
+    border: none;
+
+    padding: 14px 30px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #dcdcff
+        );
+
+    color: #111126;
+
+    font-size: 0.95rem;
+
+    font-weight: 900;
+
+    letter-spacing: 0.8px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.25);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+#startButton:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,0.35);
+}
+
+
+#startButton:active {
+
+    transform:
+        scale(0.95);
+}
+
+
+#startButton:disabled {
+
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* ========================================
+   TAP BUTTON
+======================================== */
+
+#tapButton {
+
+    width: 220px;
+
+    height: 220px;
+
+    margin: 20px auto;
+
+    display: block;
+
+    border: none;
+
+    border-radius: 50%;
+
+    touch-action: manipulation;
+
+    -webkit-tap-highlight-color: transparent;
+
+    user-select: none;
+
+    -webkit-user-select: none;
+
+    cursor: pointer;
+
+    font-size: 2rem;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    color: #111126;
+
+    background:
+
+        radial-gradient(
+            circle at 32% 25%,
+            #ffffff 0%,
+            #eeeeff 18%,
+            #aaa4ff 42%,
+            #7568ff 68%,
+            #5143dc 100%
+        );
+
+    box-shadow:
+
+        0 0 0 8px rgba(120,105,255,0.08),
+
+        0 0 0 16px rgba(120,105,255,0.035),
+
+        0 20px 50px rgba(75,60,255,0.35),
+
+        inset 0 -18px 30px rgba(0,0,0,0.18),
+
+        inset 0 5px 10px rgba(255,255,255,0.65);
+
+    transition:
+
+        transform 0.08s ease,
+
+        box-shadow 0.08s ease;
+}
+
+
+/* ========================================
+   TAP BUTTON ACTIVE
+======================================== */
+
+#tapButton:active {
+
+    transform:
+        scale(0.90);
+
+    box-shadow:
+
+        0 0 0 5px rgba(120,105,255,0.12),
+
+        0 8px 25px rgba(75,60,255,0.3),
+
+        inset 0 10px 20px rgba(0,0,0,0.25);
+}
+
+
+/* ========================================
+   TAP BUTTON PULSE
+======================================== */
+
+@keyframes pulse {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.035);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+#tapButton:not(:disabled) {
+
+    animation:
+        pulse 1.6s infinite;
+}
+
+
+/* ========================================
+   DISABLED TAP BUTTON
+======================================== */
+
+#tapButton:disabled {
+
+    opacity: 0.35;
+
+    cursor: not-allowed;
+
+    animation: none;
+}
+
+
+/* ========================================
+   TAP +1 EFFECT
+======================================== */
+
+.tap-effect {
+
+    position: fixed;
+
+    pointer-events: none;
+
+    z-index: 9999;
+
+    font-size: 1.5rem;
+
+    font-weight: 900;
+
+    color: white;
+
+    text-shadow:
+        0 3px 12px rgba(100,90,255,0.8);
+
+    animation:
+        tapFloat 0.7s ease-out forwards;
+}
+
+
+@keyframes tapFloat {
+
+    0% {
+
+        opacity: 1;
+
+        transform:
+            translate(-50%, -20%)
+            scale(0.8);
+    }
+
+    30% {
+
+        opacity: 1;
+
+        transform:
+            translate(-50%, -50%)
+            scale(1.2);
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            translate(-50%, -120px)
+            scale(1.45);
+    }
+}
+
+
+/* ========================================
+   MESSAGE
+======================================== */
+
+#message {
+
+    min-height: 30px;
+
+    margin: 10px 0 15px;
+
+    font-size: 1rem;
+
+    font-weight: 800;
+
+    color:
+        rgba(255,255,255,0.9);
+
+    text-shadow:
+        0 3px 15px rgba(0,0,0,0.3);
+}
+
+
+/* ========================================
+   SHARE BUTTON
+======================================== */
+
+#shareButton {
+
+    border: 1px solid
+        rgba(255,255,255,0.15);
+
+    padding: 12px 24px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    color: white;
+
+    font-size: 0.9rem;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.2);
+
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+}
+
+
+#shareButton:hover {
+
+    transform:
+        translateY(-2px);
+
+    background:
+        rgba(255,255,255,0.13);
+}
+
+
+#shareButton:active {
+
+    transform:
+        scale(0.95);
+}
+
+
+/* ========================================
+   LEADERBOARD
+======================================== */
+
+.leaderboard {
+
+    margin-top: 28px;
+
+    padding: 20px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.065),
+            rgba(255,255,255,0.025)
+        );
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,0.25),
+
+        inset 0 1px 0
+        rgba(255,255,255,0.05);
+}
+
+
+.leaderboard h2 {
+
+    font-size: 1.25rem;
+
+    font-weight: 900;
+
+    margin-bottom: 5px;
+
+    letter-spacing: 0.5px;
+}
+
+
+#challengeDate {
+
+    font-size: 0.78rem;
+
+    color:
+        rgba(255,255,255,0.45);
+
+    margin-bottom: 14px;
+}
+
+
+/* ========================================
+   LEADERBOARD ROW
+======================================== */
+
+.leaderboard-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 12px 10px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.07);
+
+    font-weight: 700;
+
+    transition:
+        background 0.15s ease,
+
+        transform 0.15s ease;
+}
+
+
+.leaderboard-row:hover {
+
+    background:
+        rgba(255,255,255,0.04);
+
+    transform:
+        translateX(3px);
+}
+
+
+.leaderboard-row:last-child {
+
+    border-bottom: none;
+}
+
+
+.leaderboard-row strong {
+
+    font-size: 1.05rem;
+
+    font-weight: 900;
+}
+
+
+/* ========================================
+   SCREEN SHAKE
+======================================== */
+
+.combo-shake-small {
+
+    animation:
+        screenShakeSmall 0.35s ease;
+}
+
+
+.combo-shake {
+
+    animation:
+        screenShake 0.5s ease;
+}
+
+
+.combo-shake-big {
+
+    animation:
+        screenShakeBig 0.7s ease;
+}
+
+
+.combo-shake-epic {
+
+    animation:
+        screenShakeEpic 0.9s ease;
+}
+
+
+.combo-shake-ultimate {
+
+    animation:
+        screenShakeUltimate 1.2s ease;
+}
+
+
+@keyframes screenShakeSmall {
+
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-3px);
+    }
+
+    75% {
+        transform: translateX(3px);
+    }
+}
+
+
+@keyframes screenShake {
+
+    0%, 100% {
+        transform: translate(0);
+    }
+
+    25% {
+        transform: translate(-5px, 3px);
+    }
+
+    50% {
+        transform: translate(5px, -3px);
+    }
+
+    75% {
+        transform: translate(-3px, 2px);
+    }
+}
+
+
+@keyframes screenShakeBig {
+
+    0%, 100% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-8px, 5px);
+    }
+
+    40% {
+        transform: translate(8px, -5px);
+    }
+
+    60% {
+        transform: translate(-6px, 4px);
+    }
+
+    80% {
+        transform: translate(5px, -3px);
+    }
+}
+
+
+@keyframes screenShakeEpic {
+
+    0%, 100% {
+        transform:
+            translate(0)
+            rotate(0);
+    }
+
+    20% {
+        transform:
+            translate(-10px, 6px)
+            rotate(-1deg);
+    }
+
+    40% {
+        transform:
+            translate(10px, -6px)
+            rotate(1deg);
+    }
+
+    60% {
+        transform:
+            translate(-8px, 5px)
+            rotate(-1deg);
+    }
+
+    80% {
+        transform:
+            translate(7px, -4px)
+            rotate(1deg);
+    }
+}
+
+
+@keyframes screenShakeUltimate {
+
+    0%, 100% {
+        transform:
+            translate(0)
+            rotate(0);
+    }
+
+    15% {
+        transform:
+            translate(-12px, 8px)
+            rotate(-1deg);
+    }
+
+    30% {
+        transform:
+            translate(12px, -8px)
+            rotate(1deg);
+    }
+
+    45% {
+        transform:
+            translate(-10px, 6px)
+            rotate(-1deg);
+    }
+
+    60% {
+        transform:
+            translate(10px, -6px)
+            rotate(1deg);
+    }
+
+    75% {
+        transform:
+            translate(-7px, 4px);
+    }
+
+    90% {
+        transform:
+            translate(5px, -3px);
+    }
+}
+
+
+/* ========================================
+   COMBO PARTICLES
+======================================== */
+
+.combo-particle {
+
+    position: fixed;
+
+    left: 50%;
+
+    top: 50%;
+
+    font-size: 22px;
+
+    pointer-events: none;
+
+    z-index: 9999;
+
+    animation:
+        comboParticle 0.9s ease-out forwards;
+}
+
+
+@keyframes comboParticle {
+
+    0% {
+
+        opacity: 1;
+
+        transform:
+            translate(-50%, -50%)
+            scale(0.5);
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            translate(
+                calc(-50% + var(--x)),
+                calc(-50% + var(--y))
+            )
+            scale(1.4);
+    }
+}
+
+
+/* ========================================
+   TIMER WARNING
+======================================== */
+
+.timer-warning {
+
+    animation:
+        timerWarning 0.8s infinite;
+}
+
+
+@keyframes timerWarning {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+/* ========================================
+   TIMER DANGER
+======================================== */
+
+.timer-danger {
+
+    animation:
+        timerDanger 0.45s infinite;
+}
+
+
+@keyframes timerDanger {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+/* ========================================
+   FINAL COUNTDOWN
+======================================== */
+
+.timer-countdown {
+
+    animation:
+        timerCountdown 0.3s ease;
+}
+
+
+@keyframes timerCountdown {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.4);
+    }
+
+    100% {
+        transform: scale(1);
     }
 }
 
@@ -504,26 +1031,151 @@ h1 {
 @media (max-width: 480px) {
 
     body {
-        padding: 15px;
+
+        padding: 10px;
+
+        align-items: flex-start;
+
+        padding-top: 18px;
     }
+
+
+    .game-container {
+
+        padding: 22px 14px;
+
+        border-radius: 24px;
+    }
+
 
     h1 {
-        font-size: 2.4rem;
+
+        font-size: 2.25rem;
+
+        letter-spacing: 3px;
     }
 
+
+    .game-container > p {
+
+        font-size: 0.85rem;
+
+        margin-bottom: 18px;
+    }
+
+
+    .stat {
+
+        padding: 12px 6px;
+
+        border-radius: 14px;
+    }
+
+
+    .stat span {
+
+        font-size: 0.62rem;
+    }
+
+
+    .stat strong {
+
+        font-size: 1.5rem;
+    }
+
+
+    #comboDisplay {
+
+        font-size: 1rem;
+
+        margin: 10px 0;
+    }
+
+
     #tapButton {
+
         width: 190px;
 
         height: 190px;
 
+        margin: 18px auto;
+
         font-size: 1.7rem;
     }
 
-    .score-value {
-        font-size: 1.6rem;
+
+    .leaderboard {
+
+        padding: 16px;
+
+        margin-top: 22px;
+    }
+}
+
+
+/* ========================================
+   EXTRA SMALL PHONES
+======================================== */
+
+@media (max-width: 360px) {
+
+    h1 {
+
+        font-size: 2rem;
     }
 
-    #comboDisplay {
-        font-size: 18px;
+
+    #tapButton {
+
+        width: 170px;
+
+        height: 170px;
+    }
+
+
+    .stat strong {
+
+        font-size: 1.35rem;
+    }
+}
+
+
+/* ========================================
+   REDUCE MOTION
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration: 0.01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        scroll-behavior: auto !important;
+    }
+}
+/* ========================================
+   SCORE TAP EFFECT
+======================================== */
+
+.score-pop {
+    animation: scorePop 0.18s ease-out;
+}
+
+@keyframes scorePop {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+
+    100% {
+        transform: scale(1);
     }
 }

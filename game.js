@@ -13,7 +13,6 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_Kl_qSSKNGYVlGMwRR7PiZA_RstX8Ug9";
 
-
 const supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
@@ -32,13 +31,20 @@ let timer = null;
 
 
 // ========================================
-// COMBO SYSTEM
+// COMBO VARIABLES
 // ========================================
 
 let combo = 0;
 let comboTimer = null;
 
 const COMBO_TIMEOUT = 1000;
+
+
+// ========================================
+// AUDIO
+// ========================================
+
+let audioContext = null;
 
 
 // ========================================
@@ -54,22 +60,11 @@ const today =
 // ========================================
 
 let bestScore =
-    Number(localStorage.getItem("tapRushBest")) || 0;
-
-
-// ========================================
-// SAVED PLAYER NAME
-// ========================================
-
-let savedPlayerName =
-    localStorage.getItem("tapRushPlayerName") || "";
-
-
-// ========================================
-// AUDIO
-// ========================================
-
-let audioContext = null;
+    Number(
+        localStorage.getItem(
+            "tapRushBest"
+        )
+    ) || 0;
 
 
 // ========================================
@@ -98,13 +93,19 @@ const message =
     document.getElementById("message");
 
 const leaderboardList =
-    document.getElementById("leaderboardList");
+    document.getElementById(
+        "leaderboardList"
+    );
 
 const challengeDate =
-    document.getElementById("challengeDate");
+    document.getElementById(
+        "challengeDate"
+    );
 
 const comboDisplay =
-    document.getElementById("comboDisplay");
+    document.getElementById(
+        "comboDisplay"
+    );
 
 
 // ========================================
@@ -115,18 +116,12 @@ bestDisplay.textContent =
     bestScore;
 
 
-if (comboDisplay) {
-
-    comboDisplay.textContent =
-        "🔥 COMBO x0";
-
-}
-
-
 if (challengeDate) {
 
     const date =
-        new Date(today + "T00:00:00");
+        new Date(
+            today + "T00:00:00"
+        );
 
     challengeDate.textContent =
         date.toLocaleDateString(
@@ -140,6 +135,13 @@ if (challengeDate) {
 }
 
 
+if (comboDisplay) {
+
+    comboDisplay.textContent =
+        "🔥 COMBO x0";
+}
+
+
 // ========================================
 // BUTTON EVENTS
 // ========================================
@@ -150,14 +152,692 @@ startButton.addEventListener(
 );
 
 tapButton.addEventListener(
-    "click",
-    tap
+    "pointerdown",
+    function (event) {
+
+        event.preventDefault();
+
+        tap();
+    }
 );
 
 shareButton.addEventListener(
     "click",
     shareScore
 );
+
+
+// ========================================
+// AUDIO INITIALIZATION
+// ========================================
+
+function initAudio() {
+
+    if (!audioContext) {
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+    }
+
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+
+        audioContext.resume();
+    }
+}
+
+
+// ========================================
+// NORMAL TAP SOUND
+// ========================================
+
+function playTapSound() {
+
+    try {
+
+        initAudio();
+
+        if (!audioContext) {
+            return;
+        }
+
+
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+
+        oscillator.type =
+            "sine";
+
+
+        oscillator.frequency.setValueAtTime(
+            420,
+            audioContext.currentTime
+        );
+
+
+        oscillator.frequency.exponentialRampToValueAtTime(
+            650,
+            audioContext.currentTime + 0.06
+        );
+
+
+        gain.gain.setValueAtTime(
+            0.05,
+            audioContext.currentTime
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioContext.currentTime + 0.07
+        );
+
+
+        oscillator.connect(gain);
+
+        gain.connect(
+            audioContext.destination
+        );
+
+
+        oscillator.start();
+
+        oscillator.stop(
+            audioContext.currentTime + 0.07
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Tap sound error:",
+            error
+        );
+    }
+}
+
+
+// ========================================
+// TONE HELPER
+// ========================================
+
+function playTone(
+    frequency,
+    duration,
+    delay = 0
+) {
+
+    if (!audioContext) {
+        return;
+    }
+
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+
+    const startTime =
+        audioContext.currentTime +
+        delay;
+
+
+    oscillator.type =
+        "sine";
+
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        startTime
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.08,
+        startTime
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        startTime + duration
+    );
+
+
+    oscillator.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+
+    oscillator.start(
+        startTime
+    );
+
+
+    oscillator.stop(
+        startTime + duration
+    );
+}
+
+
+// ========================================
+// COMBO MILESTONE SOUNDS
+// ========================================
+
+function playComboSound(
+    comboLevel
+) {
+
+    try {
+
+        initAudio();
+
+        if (!audioContext) {
+            return;
+        }
+
+
+        // X5
+
+        if (comboLevel === 5) {
+
+            playTone(700, 0.15);
+
+            playTone(
+                1000,
+                0.18,
+                0.12
+            );
+        }
+
+
+        // X10
+
+        if (comboLevel === 10) {
+
+            playTone(700, 0.12);
+
+            playTone(
+                900,
+                0.12,
+                0.12
+            );
+
+            playTone(
+                1200,
+                0.18,
+                0.24
+            );
+        }
+
+
+        // X20
+
+        if (comboLevel === 20) {
+
+            playTone(600, 0.12);
+
+            playTone(
+                800,
+                0.12,
+                0.12
+            );
+
+            playTone(
+                1000,
+                0.12,
+                0.24
+            );
+
+            playTone(
+                1400,
+                0.25,
+                0.36
+            );
+        }
+
+
+        // X50
+
+        if (comboLevel === 50) {
+
+            playTone(650, 0.10);
+
+            playTone(
+                850,
+                0.10,
+                0.10
+            );
+
+            playTone(
+                1050,
+                0.10,
+                0.20
+            );
+
+            playTone(
+                1300,
+                0.18,
+                0.30
+            );
+        }
+
+
+        // X80
+
+        if (comboLevel === 80) {
+
+            playTone(700, 0.10);
+
+            playTone(
+                900,
+                0.10,
+                0.10
+            );
+
+            playTone(
+                1100,
+                0.10,
+                0.20
+            );
+
+            playTone(
+                1350,
+                0.10,
+                0.30
+            );
+
+            playTone(
+                1550,
+                0.20,
+                0.40
+            );
+        }
+
+
+        // X100
+
+        if (comboLevel === 100) {
+
+            playTone(700, 0.12);
+
+            playTone(
+                900,
+                0.12,
+                0.12
+            );
+
+            playTone(
+                1100,
+                0.12,
+                0.24
+            );
+
+            playTone(
+                1400,
+                0.18,
+                0.36
+            );
+        }
+
+
+        // X150
+
+        if (comboLevel === 150) {
+
+            playTone(700, 0.10);
+
+            playTone(
+                900,
+                0.10,
+                0.10
+            );
+
+            playTone(
+                1100,
+                0.10,
+                0.20
+            );
+
+            playTone(
+                1300,
+                0.10,
+                0.30
+            );
+
+            playTone(
+                1600,
+                0.25,
+                0.40
+            );
+        }
+
+
+        // X200
+
+        if (comboLevel === 200) {
+
+            playTone(600, 0.10);
+
+            playTone(
+                800,
+                0.10,
+                0.10
+            );
+
+            playTone(
+                1000,
+                0.10,
+                0.20
+            );
+
+            playTone(
+                1200,
+                0.10,
+                0.30
+            );
+
+            playTone(
+                1500,
+                0.12,
+                0.40
+            );
+
+            playTone(
+                1800,
+                0.30,
+                0.52
+            );
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Combo sound error:",
+            error
+        );
+    }
+}
+
+
+// ========================================
+// COMBO CELEBRATION
+// ========================================
+
+function comboCelebration(
+    comboLevel
+) {
+
+    // X5
+
+    if (comboLevel === 5) {
+
+        if (comboDisplay) {
+
+            comboDisplay.classList.add(
+                "combo-celebrate-small"
+            );
+
+
+            setTimeout(() => {
+
+                comboDisplay.classList.remove(
+                    "combo-celebrate-small"
+                );
+
+            }, 400);
+        }
+    }
+
+
+    // X10
+
+    if (comboLevel === 10) {
+
+        document.body.classList.add(
+            "combo-shake-small"
+        );
+
+        createComboParticles(8);
+
+
+        setTimeout(() => {
+
+            document.body.classList.remove(
+                "combo-shake-small"
+            );
+
+        }, 350);
+    }
+
+
+    // X20
+
+    if (comboLevel === 20) {
+
+        document.body.classList.add(
+            "combo-shake"
+        );
+
+        createComboParticles(15);
+
+
+        setTimeout(() => {
+
+            document.body.classList.remove(
+                "combo-shake"
+            );
+
+        }, 500);
+    }
+
+
+    // X50
+
+    if (comboLevel === 50) {
+
+        document.body.classList.add(
+            "combo-shake-big"
+        );
+
+        createComboParticles(22);
+
+
+        setTimeout(() => {
+
+            document.body.classList.remove(
+                "combo-shake-big"
+            );
+
+        }, 600);
+    }
+
+
+    // X80
+
+    if (comboLevel === 80) {
+
+        document.body.classList.add(
+            "combo-shake-big"
+        );
+
+        createComboParticles(26);
+
+
+        setTimeout(() => {
+
+            document.body.classList.remove(
+                "combo-shake-big"
+            );
+
+        }, 650);
+    }
+
+
+    // X100
+
+    if (comboLevel === 100) {
+
+        document.body.classList.add(
+            "combo-shake-big"
+        );
+
+        createComboParticles(30);
+
+
+        setTimeout(() => {
+
+            document.body.classList.remove(
+                "combo-shake-big"
+            );
+
+        }, 700);
+    }
+
+
+    // X150
+
+    if (comboLevel === 150) {
+
+        document.body.classList.add(
+            "combo-shake-epic"
+        );
+
+        createComboParticles(45);
+
+
+        setTimeout(() => {
+
+            document.body.classList.remove(
+                "combo-shake-epic"
+            );
+
+        }, 900);
+    }
+
+
+    // X200
+
+    if (comboLevel === 200) {
+
+        document.body.classList.add(
+            "combo-shake-ultimate"
+        );
+
+        createComboParticles(70);
+
+
+        setTimeout(() => {
+
+            document.body.classList.remove(
+                "combo-shake-ultimate"
+            );
+
+        }, 1200);
+    }
+}
+
+
+// ========================================
+// COMBO PARTICLES
+// ========================================
+
+function createComboParticles(
+    amount
+) {
+
+    for (
+        let i = 0;
+        i < amount;
+        i++
+    ) {
+
+        const particle =
+            document.createElement(
+                "div"
+            );
+
+
+        particle.className =
+            "combo-particle";
+
+
+        particle.textContent =
+            [
+                "🔥",
+                "⚡",
+                "💥",
+                "✨"
+            ][
+                Math.floor(
+                    Math.random() * 4
+                )
+            ];
+
+
+        particle.style.left =
+            `${
+                50 +
+                (
+                    Math.random() * 30 -
+                    15
+                )
+            }%`;
+
+
+        particle.style.top =
+            `${
+                50 +
+                (
+                    Math.random() * 20 -
+                    10
+                )
+            }%`;
+
+
+        particle.style.setProperty(
+            "--x",
+            `${
+                Math.random() * 400 -
+                200
+            }px`
+        );
+
+
+        particle.style.setProperty(
+            "--y",
+            `${
+                Math.random() * 400 -
+                200
+            }px`
+        );
+
+
+        document.body.appendChild(
+            particle
+        );
+
+
+        setTimeout(() => {
+
+            particle.remove();
+
+        }, 900);
+    }
+}
 
 
 // ========================================
@@ -170,12 +850,9 @@ function startGame() {
 
     timeLeft = 20;
 
-    gameRunning = true;
-
-
-    // Reset combo
-
     combo = 0;
+
+    gameRunning = true;
 
 
     if (comboTimer) {
@@ -183,11 +860,15 @@ function startGame() {
         clearTimeout(
             comboTimer
         );
-
-        comboTimer = null;
-
     }
 
+
+    scoreDisplay.textContent =
+        score;
+
+    scoreDisplay.classList.remove(
+        "score-pop"
+    );
 
     if (comboDisplay) {
 
@@ -198,34 +879,32 @@ function startGame() {
             "combo-pop"
         );
 
+        comboDisplay.classList.remove(
+            "combo-milestone"
+        );
     }
 
 
-    scoreDisplay.textContent =
-        score;
-
-    timeDisplay.textContent =
-        timeLeft;
+    message.textContent =
+        "";
 
 
-    message.textContent = "";
+    startButton.disabled =
+        true;
 
-
-    startButton.disabled = true;
-
-    tapButton.disabled = false;
+    tapButton.disabled =
+        false;
 
 
     shareButton.style.display =
         "none";
 
 
-    // Prepare audio
-
     initAudio();
 
 
-    timer = setInterval(() => {
+    timer =
+    setInterval(() => {
 
         timeLeft--;
 
@@ -233,10 +912,73 @@ function startGame() {
             timeLeft;
 
 
+        // ========================================
+        // TIMER WARNING EFFECT
+        // ========================================
+
+        if (timeLeft <= 10) {
+
+            timeDisplay.classList.add(
+                "timer-warning"
+            );
+
+        }
+
+
+        if (timeLeft <= 5) {
+
+            timeDisplay.classList.remove(
+                "timer-warning"
+            );
+
+            timeDisplay.classList.add(
+                "timer-danger"
+            );
+
+        }
+
+
+        // ========================================
+        // COUNTDOWN EFFECT
+        // ========================================
+
+        if (
+            timeLeft <= 3 &&
+            timeLeft > 0
+        ) {
+
+            timeDisplay.classList.remove(
+                "timer-countdown"
+            );
+
+            void timeDisplay.offsetWidth;
+
+            timeDisplay.classList.add(
+                "timer-countdown"
+            );
+        }
+
+
+        // ========================================
+        // GAME OVER
+        // ========================================
+
         if (timeLeft <= 0) {
 
-            endGame();
+            timeDisplay.classList.remove(
+                "timer-warning"
+            );
 
+            timeDisplay.classList.remove(
+                "timer-danger"
+            );
+
+            timeDisplay.classList.remove(
+                "timer-countdown"
+            );
+
+
+            endGame();
         }
 
     }, 1000);
@@ -254,19 +996,25 @@ function tap() {
     }
 
 
-    // ========================================
     // SCORE
-    // ========================================
 
     score++;
 
+
     scoreDisplay.textContent =
         score;
+    scoreDisplay.classList.remove(
+    "score-pop"
+    );
+
+    void scoreDisplay.offsetWidth;
+
+    scoreDisplay.classList.add(
+    "score-pop"
+    );
 
 
-    // ========================================
     // COMBO
-    // ========================================
 
     combo++;
 
@@ -277,14 +1025,10 @@ function tap() {
             `🔥 COMBO x${combo}`;
 
 
-        // Pop animation
-
         comboDisplay.classList.remove(
             "combo-pop"
         );
 
-
-        // Force browser to restart animation
 
         void comboDisplay.offsetWidth;
 
@@ -294,49 +1038,51 @@ function tap() {
         );
 
 
-        // ========================================
-        // COMBO MILESTONE EFFECTS
-        // ========================================
+        // MILESTONES
 
         if (
             combo === 5 ||
             combo === 10 ||
             combo === 20 ||
             combo === 50 ||
+            combo === 80 ||
             combo === 100 ||
-            combo === 200 
-        )  {
+            combo === 150 ||
+            combo === 200
+        ) {
 
-    if (comboDisplay) {
+            comboDisplay.classList.remove(
+                "combo-milestone"
+            );
 
-        comboDisplay.classList.remove(
-            "combo-milestone"
-        );
 
-        void comboDisplay.offsetWidth;
+            void comboDisplay.offsetWidth;
 
-        comboDisplay.classList.add(
-            "combo-milestone"
-        );
 
+            comboDisplay.classList.add(
+                "combo-milestone"
+            );
+
+
+            playComboSound(
+                combo
+            );
+
+
+            comboCelebration(
+                combo
+            );
+        }
     }
 
-    playComboSound(combo);
-}
 
-    }
-
-
-    // ========================================
     // RESET COMBO TIMER
-    // ========================================
 
     if (comboTimer) {
 
         clearTimeout(
             comboTimer
         );
-
     }
 
 
@@ -360,306 +1106,19 @@ function tap() {
                 comboDisplay.classList.remove(
                     "combo-milestone"
                 );
-
             }
 
         }, COMBO_TIMEOUT);
 
 
-    // ========================================
     // TAP EFFECT
-    // ========================================
 
     createTapEffect();
 
 
-    // ========================================
     // TAP SOUND
-    // ========================================
 
     playTapSound();
-
-}
-// ========================================
-// COMBO MILESTONE SOUNDS
-// ========================================
-
-function playComboSound(comboLevel) {
-
-    try {
-
-        initAudio();
-
-        if (!audioContext) {
-            return;
-        }
-
-        const now =
-            audioContext.currentTime;
-
-        // ========================================
-        // X5 - SMALL COMBO
-        // ========================================
-
-        if (comboLevel === 5) {
-
-            const oscillator =
-                audioContext.createOscillator();
-
-            const gain =
-                audioContext.createGain();
-
-            oscillator.type = "sine";
-
-            oscillator.frequency.setValueAtTime(
-                700,
-                now
-            );
-
-            oscillator.frequency.exponentialRampToValueAtTime(
-                1000,
-                now + 0.15
-            );
-
-            gain.gain.setValueAtTime(
-                0.08,
-                now
-            );
-
-            gain.gain.exponentialRampToValueAtTime(
-                0.001,
-                now + 0.15
-            );
-
-            oscillator.connect(gain);
-
-            gain.connect(
-                audioContext.destination
-            );
-
-            oscillator.start(now);
-
-            oscillator.stop(
-                now + 0.15
-            );
-        }
-
-
-        // ========================================
-        // X10 - BIGGER COMBO
-        // ========================================
-
-        if (comboLevel === 10) {
-
-            playTone(700, 0.12);
-            playTone(900, 0.12, 0.12);
-            playTone(1200, 0.18, 0.24);
-        }
-
-
-        // ========================================
-        // X20 - MAJOR COMBO
-        // ========================================
-
-        if (comboLevel === 20) {
-
-            playTone(600, 0.12);
-            playTone(800, 0.12, 0.12);
-            playTone(1000, 0.12, 0.24);
-            playTone(1400, 0.25, 0.36);
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Combo sound error:",
-            error
-        );
-
-    }
-}
-
-
-// ========================================
-// COMBO TONE HELPER
-// ========================================
-
-function playTone(
-    frequency,
-    duration,
-    delay = 0
-) {
-
-    if (!audioContext) {
-        return;
-    }
-
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-    const startTime =
-        audioContext.currentTime +
-        delay;
-
-    oscillator.type =
-        "sine";
-
-    oscillator.frequency.setValueAtTime(
-        frequency,
-        startTime
-    );
-
-    gain.gain.setValueAtTime(
-        0.08,
-        startTime
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        0.001,
-        startTime + duration
-    );
-
-    oscillator.connect(gain);
-
-    gain.connect(
-        audioContext.destination
-    );
-
-    oscillator.start(
-        startTime
-    );
-
-    oscillator.stop(
-        startTime + duration
-    );
-}
-
-// ========================================
-// INITIALIZE AUDIO
-// ========================================
-
-function initAudio() {
-
-    try {
-
-        const AudioContext =
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-
-        if (!AudioContext) {
-            return;
-        }
-
-
-        if (!audioContext) {
-
-            audioContext =
-                new AudioContext();
-
-        }
-
-
-        if (
-            audioContext.state ===
-            "suspended"
-        ) {
-
-            audioContext.resume();
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Audio initialization error:",
-            error
-        );
-
-    }
-}
-
-
-// ========================================
-// TAP SOUND
-// ========================================
-
-function playTapSound() {
-
-    try {
-
-        initAudio();
-
-
-        if (!audioContext) {
-            return;
-        }
-
-
-        const oscillator =
-            audioContext.createOscillator();
-
-
-        const gain =
-            audioContext.createGain();
-
-
-        oscillator.type =
-            "sine";
-
-
-        oscillator.frequency.setValueAtTime(
-            700,
-            audioContext.currentTime
-        );
-
-
-        oscillator.frequency.exponentialRampToValueAtTime(
-            350,
-            audioContext.currentTime + 0.08
-        );
-
-
-        gain.gain.setValueAtTime(
-            0.08,
-            audioContext.currentTime
-        );
-
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.001,
-            audioContext.currentTime + 0.08
-        );
-
-
-        oscillator.connect(
-            gain
-        );
-
-
-        gain.connect(
-            audioContext.destination
-        );
-
-
-        oscillator.start();
-
-
-        oscillator.stop(
-            audioContext.currentTime + 0.08
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Tap sound error:",
-            error
-        );
-
-    }
 }
 
 
@@ -675,34 +1134,33 @@ function createTapEffect() {
         );
 
 
-    effect.textContent =
-        "+1";
-
-
     effect.className =
         "tap-effect";
 
 
+    effect.textContent =
+        "+1";
+
+
+    const rect =
+        tapButton.getBoundingClientRect();
+
+
     effect.style.left =
-        `${Math.random() * 60 + 20}%`;
+        `${
+            rect.left +
+            rect.width / 2
+        }px`;
 
 
     effect.style.top =
-        `${Math.random() * 30 + 30}%`;
+        `${
+            rect.top +
+            rect.height / 2
+        }px`;
 
 
-    const gameArea =
-        document.querySelector(
-            ".game-area"
-        );
-
-
-    if (!gameArea) {
-        return;
-    }
-
-
-    gameArea.appendChild(
+    document.body.appendChild(
         effect
     );
 
@@ -716,216 +1174,6 @@ function createTapEffect() {
 
 
 // ========================================
-// GAME OVER SOUND
-// ========================================
-
-function playGameOverSound() {
-
-    try {
-
-        initAudio();
-
-
-        if (!audioContext) {
-            return;
-        }
-
-
-        const oscillator =
-            audioContext.createOscillator();
-
-
-        const gain =
-            audioContext.createGain();
-
-
-        oscillator.type =
-            "sine";
-
-
-        oscillator.frequency.setValueAtTime(
-            350,
-            audioContext.currentTime
-        );
-
-
-        oscillator.frequency.exponentialRampToValueAtTime(
-            180,
-            audioContext.currentTime + 0.25
-        );
-
-
-        gain.gain.setValueAtTime(
-            0.08,
-            audioContext.currentTime
-        );
-
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.001,
-            audioContext.currentTime + 0.25
-        );
-
-
-        oscillator.connect(
-            gain
-        );
-
-
-        gain.connect(
-            audioContext.destination
-        );
-
-
-        oscillator.start();
-
-
-        oscillator.stop(
-            audioContext.currentTime + 0.25
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Game over sound error:",
-            error
-        );
-
-    }
-}
-
-
-// ========================================
-// NEW RECORD SOUND
-// ========================================
-
-function playNewRecordSound() {
-
-    try {
-
-        initAudio();
-
-
-        if (!audioContext) {
-            return;
-        }
-
-
-        const now =
-            audioContext.currentTime;
-
-
-        // First note
-
-        const oscillator1 =
-            audioContext.createOscillator();
-
-
-        const gain1 =
-            audioContext.createGain();
-
-
-        oscillator1.type =
-            "sine";
-
-
-        oscillator1.frequency.value =
-            600;
-
-
-        gain1.gain.setValueAtTime(
-            0.08,
-            now
-        );
-
-
-        gain1.gain.exponentialRampToValueAtTime(
-            0.001,
-            now + 0.12
-        );
-
-
-        oscillator1.connect(
-            gain1
-        );
-
-
-        gain1.connect(
-            audioContext.destination
-        );
-
-
-        oscillator1.start(
-            now
-        );
-
-
-        oscillator1.stop(
-            now + 0.12
-        );
-
-
-        // Second note
-
-        const oscillator2 =
-            audioContext.createOscillator();
-
-
-        const gain2 =
-            audioContext.createGain();
-
-
-        oscillator2.type =
-            "sine";
-
-
-        oscillator2.frequency.value =
-            900;
-
-
-        gain2.gain.setValueAtTime(
-            0.08,
-            now + 0.12
-        );
-
-
-        gain2.gain.exponentialRampToValueAtTime(
-            0.001,
-            now + 0.30
-        );
-
-
-        oscillator2.connect(
-            gain2
-        );
-
-
-        gain2.connect(
-            audioContext.destination
-        );
-
-
-        oscillator2.start(
-            now + 0.12
-        );
-
-
-        oscillator2.stop(
-            now + 0.30
-        );
-
-    } catch (error) {
-
-        console.error(
-            "New record sound error:",
-            error
-        );
-
-    }
-}
-
-
-// ========================================
 // END GAME
 // ========================================
 
@@ -934,7 +1182,9 @@ async function endGame() {
     gameRunning = false;
 
 
-    clearInterval(timer);
+    clearInterval(
+        timer
+    );
 
 
     if (comboTimer) {
@@ -942,39 +1192,26 @@ async function endGame() {
         clearTimeout(
             comboTimer
         );
-
-        comboTimer = null;
-
     }
 
 
     combo = 0;
 
 
-    if (comboDisplay) {
-
-        comboDisplay.textContent =
-            "🔥 COMBO x0";
-
-        comboDisplay.classList.remove(
-            "combo-pop"
-        );
-
-    }
+    tapButton.disabled =
+        true;
 
 
-    tapButton.disabled = true;
+    startButton.disabled =
+        false;
 
-    startButton.disabled = false;
 
-
-    // ========================================
     // PERSONAL BEST
-    // ========================================
 
     if (score > bestScore) {
 
-        bestScore = score;
+        bestScore =
+            score;
 
 
         localStorage.setItem(
@@ -990,26 +1227,10 @@ async function endGame() {
         message.textContent =
             `🎉 NEW RECORD! ${score} taps!`;
 
-
-        // Give audio time to resume
-
-        initAudio();
-
-
-        setTimeout(() => {
-
-            playNewRecordSound();
-
-        }, 50);
-
     } else {
 
         message.textContent =
             `Game Over! ${score} taps.`;
-
-
-        playGameOverSound();
-
     }
 
 
@@ -1017,9 +1238,7 @@ async function endGame() {
         "block";
 
 
-    // ========================================
-    // SAVE TODAY'S SCORE
-    // ========================================
+    // SAVE SCORE
 
     await submitScore();
 }
@@ -1031,6 +1250,10 @@ async function endGame() {
 
 async function submitScore() {
 
+    // ========================================
+    // GET SAVED NICKNAME
+    // ========================================
+
     let playerName =
         localStorage.getItem(
             "tapRushPlayerName"
@@ -1038,7 +1261,7 @@ async function submitScore() {
 
 
     // ========================================
-    // ASK FOR NAME ONLY FIRST TIME
+    // ASK ONLY ON FIRST GAME
     // ========================================
 
     if (!playerName) {
@@ -1057,7 +1280,10 @@ async function submitScore() {
         playerName =
             playerName
                 .trim()
-                .substring(0, 20);
+                .substring(
+                    0,
+                    20
+                );
 
 
         if (!playerName) {
@@ -1065,19 +1291,13 @@ async function submitScore() {
         }
 
 
+        // SAVE NICKNAME
+
         localStorage.setItem(
             "tapRushPlayerName",
             playerName
         );
-
     }
-
-
-    console.log(
-        "Checking daily score for:",
-        playerName,
-        today
-    );
 
 
     // ========================================
@@ -1127,15 +1347,10 @@ async function submitScore() {
 
     if (existingPlayer) {
 
-        console.log(
-            "Today's existing best:",
+        if (
+            score >
             existingPlayer.score
-        );
-
-
-        // Only update if new score is higher
-
-        if (score > existingPlayer.score) {
+        ) {
 
             const {
                 error: updateError
@@ -1143,7 +1358,8 @@ async function submitScore() {
                 await supabaseClient
                     .from("leaderboard")
                     .update({
-                        score: score
+                        score:
+                            score
                     })
                     .eq(
                         "id",
@@ -1175,7 +1391,6 @@ async function submitScore() {
 
             message.textContent =
                 `Your score: ${score}. Today's best: ${existingPlayer.score}`;
-
         }
 
     }
@@ -1225,7 +1440,6 @@ async function submitScore() {
 
         message.textContent =
             `🎉 You're on today's leaderboard with ${score}!`;
-
     }
 
 
@@ -1237,7 +1451,7 @@ async function submitScore() {
 
 
     // ========================================
-    // SHOW PLAYER RANK
+    // SHOW PLAYER RANK + SCORE
     // ========================================
 
     await showPlayerRank(
@@ -1247,7 +1461,7 @@ async function submitScore() {
 
 
 // ========================================
-// LOAD TODAY'S LEADERBOARD
+// LOAD TOP 10 LEADERBOARD
 // ========================================
 
 async function loadLeaderboard() {
@@ -1294,7 +1508,10 @@ async function loadLeaderboard() {
     }
 
 
-    if (!data || data.length === 0) {
+    if (
+        !data ||
+        data.length === 0
+    ) {
 
         leaderboardList.innerHTML =
             "No scores today. Be the first!";
@@ -1307,10 +1524,6 @@ async function loadLeaderboard() {
     leaderboardList.innerHTML =
         "";
 
-
-    // ========================================
-    // DISPLAY LEADERBOARD
-    // ========================================
 
     data.forEach(
         (player, index) => {
@@ -1344,7 +1557,6 @@ async function loadLeaderboard() {
 
                 rank =
                     `${index + 1}.`;
-
             }
 
 
@@ -1365,14 +1577,13 @@ async function loadLeaderboard() {
             leaderboardList.appendChild(
                 row
             );
-
         }
     );
 }
 
 
 // ========================================
-// SHOW PLAYER'S CURRENT RANK
+// SHOW PLAYER RANK + SCORE
 // ========================================
 
 async function showPlayerRank(
@@ -1420,12 +1631,17 @@ async function showPlayerRank(
     const playerIndex =
         data.findIndex(
             player =>
-                player.player_name.toLowerCase() ===
-                playerName.toLowerCase()
+                player.player_name
+                    .toLowerCase() ===
+                playerName
+                    .toLowerCase()
         );
 
 
-    if (playerIndex === -1) {
+    if (
+        playerIndex === -1
+    ) {
+
         return;
     }
 
@@ -1434,8 +1650,12 @@ async function showPlayerRank(
         playerIndex + 1;
 
 
+    const playerScore =
+        data[playerIndex].score;
+
+
     message.textContent =
-        `🏆 You're #${rank} today with ${score} taps!`;
+        `🏆 You're #${rank} today with ${playerScore} taps!`;
 }
 
 
@@ -1443,7 +1663,9 @@ async function showPlayerRank(
 // PROTECT LEADERBOARD DISPLAY
 // ========================================
 
-function escapeHTML(text) {
+function escapeHTML(
+    text
+) {
 
     const div =
         document.createElement(
@@ -1473,10 +1695,6 @@ async function shareScore() {
         window.location.href;
 
 
-    // ========================================
-    // MOBILE NATIVE SHARE
-    // ========================================
-
     if (navigator.share) {
 
         try {
@@ -1491,7 +1709,6 @@ async function shareScore() {
 
                 url:
                     url
-
             });
 
 
@@ -1506,14 +1723,9 @@ async function shareScore() {
 
                 return;
             }
-
         }
     }
 
-
-    // ========================================
-    // CLIPBOARD FALLBACK
-    // ========================================
 
     try {
 
@@ -1526,14 +1738,12 @@ async function shareScore() {
             "Share message copied!"
         );
 
-
     } catch (error) {
 
         prompt(
             "Copy this message:",
             `${text}\n${url}`
         );
-
     }
 }
 
