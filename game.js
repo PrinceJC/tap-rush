@@ -32,6 +32,14 @@ let timer = null;
 
 
 // ========================================
+// TODAY'S CHALLENGE DATE
+// ========================================
+
+const today =
+    new Date().toISOString().split("T")[0];
+
+
+// ========================================
 // PERSONAL BEST
 // ========================================
 
@@ -67,12 +75,33 @@ const message =
 const leaderboardList =
     document.getElementById("leaderboardList");
 
+const challengeDate =
+    document.getElementById("challengeDate");
+
 
 // ========================================
 // INITIAL DISPLAY
 // ========================================
 
-bestDisplay.textContent = bestScore;
+bestDisplay.textContent =
+    bestScore;
+
+
+if (challengeDate) {
+
+    const date =
+        new Date(today + "T00:00:00");
+
+    challengeDate.textContent =
+        date.toLocaleDateString(
+            undefined,
+            {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+}
 
 
 // ========================================
@@ -214,20 +243,23 @@ async function endGame() {
         "block";
 
 
-    // Save score to Supabase
+    // ========================================
+    // SAVE TODAY'S SCORE
+    // ========================================
+
     await submitScore();
 }
 
 
 // ========================================
-// SUBMIT / UPDATE SCORE
+// SUBMIT / UPDATE DAILY SCORE
 // ========================================
 
 async function submitScore() {
 
     let playerName =
         prompt(
-            "Enter your nickname for the leaderboard:"
+            "Enter your nickname for today's leaderboard:"
         );
 
 
@@ -249,13 +281,14 @@ async function submitScore() {
 
 
     console.log(
-        "Checking player:",
-        playerName
+        "Checking daily score for:",
+        playerName,
+        today
     );
 
 
     // ========================================
-    // CHECK IF PLAYER ALREADY EXISTS
+    // CHECK TODAY'S EXISTING SCORE
     // ========================================
 
     const {
@@ -265,11 +298,15 @@ async function submitScore() {
         await supabaseClient
             .from("leaderboard")
             .select(
-                "id, player_name, score"
+                "id, player_name, score, challenge_date"
             )
             .eq(
                 "player_name",
                 playerName
+            )
+            .eq(
+                "challenge_date",
+                today
             )
             .maybeSingle();
 
@@ -283,7 +320,7 @@ async function submitScore() {
 
 
         alert(
-            "Unable to check your leaderboard score."
+            "Unable to check your daily score."
         );
 
 
@@ -292,18 +329,18 @@ async function submitScore() {
 
 
     // ========================================
-    // EXISTING PLAYER
+    // EXISTING PLAYER TODAY
     // ========================================
 
     if (existingPlayer) {
 
         console.log(
-            "Existing best:",
+            "Today's existing best:",
             existingPlayer.score
         );
 
 
-        // Only update if the new score is higher
+        // Only update if new score is higher
         if (score > existingPlayer.score) {
 
             const {
@@ -329,7 +366,7 @@ async function submitScore() {
 
 
                 alert(
-                    "Unable to update your score."
+                    "Unable to update your daily score."
                 );
 
 
@@ -338,12 +375,12 @@ async function submitScore() {
 
 
             message.textContent =
-                `🏆 New leaderboard record! ${score} taps!`;
+                `🏆 New daily record! ${score} taps!`;
 
         } else {
 
             message.textContent =
-                `Your score: ${score}. Your best: ${existingPlayer.score}`;
+                `Your score: ${score}. Today's best: ${existingPlayer.score}`;
 
         }
 
@@ -351,7 +388,7 @@ async function submitScore() {
 
 
     // ========================================
-    // NEW PLAYER
+    // NEW PLAYER TODAY
     // ========================================
 
     else {
@@ -367,7 +404,10 @@ async function submitScore() {
                             playerName,
 
                         score:
-                            score
+                            score,
+
+                        challenge_date:
+                            today
                     }
                 ]);
 
@@ -381,7 +421,7 @@ async function submitScore() {
 
 
             alert(
-                "Unable to submit your score."
+                "Unable to submit your daily score."
             );
 
 
@@ -390,7 +430,7 @@ async function submitScore() {
 
 
         message.textContent =
-            `🎉 You're on the leaderboard with ${score}!`;
+            `🎉 You're on today's leaderboard with ${score}!`;
 
     }
 
@@ -401,13 +441,13 @@ async function submitScore() {
 
 
 // ========================================
-// LOAD GLOBAL LEADERBOARD
+// LOAD TODAY'S LEADERBOARD
 // ========================================
 
 async function loadLeaderboard() {
 
     leaderboardList.innerHTML =
-        "Loading leaderboard...";
+        "Loading today's leaderboard...";
 
 
     const {
@@ -417,7 +457,11 @@ async function loadLeaderboard() {
         await supabaseClient
             .from("leaderboard")
             .select(
-                "player_name, score, created_at"
+                "player_name, score, challenge_date"
+            )
+            .eq(
+                "challenge_date",
+                today
             )
             .order(
                 "score",
@@ -437,7 +481,7 @@ async function loadLeaderboard() {
 
 
         leaderboardList.innerHTML =
-            "Unable to load leaderboard.";
+            "Unable to load today's leaderboard.";
 
 
         return;
@@ -447,7 +491,7 @@ async function loadLeaderboard() {
     if (!data || data.length === 0) {
 
         leaderboardList.innerHTML =
-            "No scores yet. Be the first!";
+            "No scores today. Be the first!";
 
 
         return;
@@ -456,6 +500,10 @@ async function loadLeaderboard() {
 
     leaderboardList.innerHTML = "";
 
+
+    // ========================================
+    // DISPLAY LEADERBOARD
+    // ========================================
 
     data.forEach(
         (player, index) => {
@@ -470,9 +518,32 @@ async function loadLeaderboard() {
                 "leaderboard-row";
 
 
+            let rank;
+
+
+            if (index === 0) {
+
+                rank = "🥇";
+
+            } else if (index === 1) {
+
+                rank = "🥈";
+
+            } else if (index === 2) {
+
+                rank = "🥉";
+
+            } else {
+
+                rank =
+                    `${index + 1}.`;
+
+            }
+
+
             row.innerHTML = `
                 <span>
-                    ${index + 1}.
+                    ${rank}
                     ${escapeHTML(player.player_name)}
                 </span>
 
@@ -525,7 +596,10 @@ async function shareScore() {
         window.location.href;
 
 
-    // Mobile native share
+    // ========================================
+    // MOBILE NATIVE SHARE
+    // ========================================
+
     if (navigator.share) {
 
         try {
@@ -560,7 +634,10 @@ async function shareScore() {
     }
 
 
-    // Clipboard fallback
+    // ========================================
+    // CLIPBOARD FALLBACK
+    // ========================================
+
     try {
 
         await navigator.clipboard.writeText(
@@ -585,7 +662,7 @@ async function shareScore() {
 
 
 // ========================================
-// LOAD LEADERBOARD WHEN PAGE OPENS
+// LOAD LEADERBOARD ON PAGE LOAD
 // ========================================
 
 loadLeaderboard();
