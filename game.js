@@ -13,7 +13,6 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_Kl_qSSKNGYVlGMwRR7PiZA_RstX8Ug9";
 
-
 const supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
@@ -45,6 +44,21 @@ const today =
 
 let bestScore =
     Number(localStorage.getItem("tapRushBest")) || 0;
+
+
+// ========================================
+// SAVED PLAYER NAME
+// ========================================
+
+let savedPlayerName =
+    localStorage.getItem("tapRushPlayerName") || "";
+
+
+// ========================================
+// AUDIO
+// ========================================
+
+let audioContext = null;
 
 
 // ========================================
@@ -155,6 +169,10 @@ function startGame() {
         "none";
 
 
+    // Prepare audio after user interaction
+    initAudio();
+
+
     timer = setInterval(() => {
 
         timeLeft--;
@@ -189,9 +207,358 @@ function tap() {
 
     scoreDisplay.textContent =
         score;
+
+
+    // Visual tap effect
+    createTapEffect();
+
+
+    // Tap sound
+    playTapSound();
 }
 
 
+// ========================================
+// INITIALIZE AUDIO
+// ========================================
+
+function initAudio() {
+
+    try {
+
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+
+        if (!AudioContext) {
+            return;
+        }
+
+
+        if (!audioContext) {
+
+            audioContext =
+                new AudioContext();
+
+        }
+
+
+        if (
+            audioContext.state ===
+            "suspended"
+        ) {
+
+            audioContext.resume();
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Audio initialization error:",
+            error
+        );
+
+    }
+}
+
+
+// ========================================
+// TAP SOUND
+// ========================================
+
+function playTapSound() {
+
+    try {
+
+        initAudio();
+
+
+        if (!audioContext) {
+            return;
+        }
+
+
+        const oscillator =
+            audioContext.createOscillator();
+
+
+        const gain =
+            audioContext.createGain();
+
+
+        oscillator.type =
+            "sine";
+
+
+        oscillator.frequency.setValueAtTime(
+            700,
+            audioContext.currentTime
+        );
+
+
+        oscillator.frequency.exponentialRampToValueAtTime(
+            350,
+            audioContext.currentTime + 0.08
+        );
+
+
+        gain.gain.setValueAtTime(
+            0.08,
+            audioContext.currentTime
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioContext.currentTime + 0.08
+        );
+
+
+        oscillator.connect(
+            gain
+        );
+
+
+        gain.connect(
+            audioContext.destination
+        );
+
+
+        oscillator.start();
+
+
+        oscillator.stop(
+            audioContext.currentTime + 0.08
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Tap sound error:",
+            error
+        );
+
+    }
+}
+
+
+// ========================================
+// TAP +1 EFFECT
+// ========================================
+
+function createTapEffect() {
+
+    const effect =
+        document.createElement(
+            "div"
+        );
+
+
+    effect.textContent =
+        "+1";
+
+
+    effect.className =
+        "tap-effect";
+
+
+    effect.style.left =
+        `${Math.random() * 60 + 20}%`;
+
+
+    effect.style.top =
+        `${Math.random() * 30 + 30}%`;
+
+
+    const gameArea =
+        document.querySelector(
+            ".game-area"
+        );
+
+
+    if (!gameArea) {
+        return;
+    }
+
+
+    gameArea.appendChild(
+        effect
+    );
+
+
+    setTimeout(() => {
+
+        effect.remove();
+
+    }, 700);
+}
+
+// ========================================
+// GAME OVER SOUND
+// ========================================
+
+function playGameOverSound() {
+
+    try {
+
+        initAudio();
+
+        if (!audioContext) {
+            return;
+        }
+
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+        oscillator.type =
+            "sine";
+
+        oscillator.frequency.setValueAtTime(
+            350,
+            audioContext.currentTime
+        );
+
+        oscillator.frequency.exponentialRampToValueAtTime(
+            180,
+            audioContext.currentTime + 0.25
+        );
+
+        gain.gain.setValueAtTime(
+            0.08,
+            audioContext.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioContext.currentTime + 0.25
+        );
+
+        oscillator.connect(gain);
+
+        gain.connect(
+            audioContext.destination
+        );
+
+        oscillator.start();
+
+        oscillator.stop(
+            audioContext.currentTime + 0.25
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Game over sound error:",
+            error
+        );
+
+    }
+}
+
+
+// ========================================
+// NEW RECORD SOUND
+// ========================================
+
+function playNewRecordSound() {
+
+    try {
+
+        initAudio();
+
+        if (!audioContext) {
+            return;
+        }
+
+        const now =
+            audioContext.currentTime;
+
+
+        // First note
+        const oscillator1 =
+            audioContext.createOscillator();
+
+        const gain1 =
+            audioContext.createGain();
+
+        oscillator1.type =
+            "sine";
+
+        oscillator1.frequency.value =
+            600;
+
+        gain1.gain.setValueAtTime(
+            0.08,
+            now
+        );
+
+        gain1.gain.exponentialRampToValueAtTime(
+            0.001,
+            now + 0.12
+        );
+
+        oscillator1.connect(gain1);
+
+        gain1.connect(
+            audioContext.destination
+        );
+
+        oscillator1.start(now);
+
+        oscillator1.stop(now + 0.12);
+
+
+        // Second note
+        const oscillator2 =
+            audioContext.createOscillator();
+
+        const gain2 =
+            audioContext.createGain();
+
+        oscillator2.type =
+            "sine";
+
+        oscillator2.frequency.value =
+            900;
+
+        gain2.gain.setValueAtTime(
+            0.08,
+            now + 0.12
+        );
+
+        gain2.gain.exponentialRampToValueAtTime(
+            0.001,
+            now + 0.30
+        );
+
+        oscillator2.connect(gain2);
+
+        gain2.connect(
+            audioContext.destination
+        );
+
+        oscillator2.start(
+            now + 0.12
+        );
+
+        oscillator2.stop(
+            now + 0.30
+        );
+
+    } catch (error) {
+
+        console.error(
+            "New record sound error:",
+            error
+        );
+
+    }
+}
 // ========================================
 // END GAME
 // ========================================
@@ -215,28 +582,33 @@ async function endGame() {
 
     if (score > bestScore) {
 
-        bestScore = score;
+    bestScore = score;
 
+    localStorage.setItem(
+        "tapRushBest",
+        bestScore
+    );
 
-        localStorage.setItem(
-            "tapRushBest",
-            bestScore
-        );
+    bestDisplay.textContent =
+        bestScore;
 
+    message.textContent =
+        `🎉 NEW RECORD! ${score} taps!`;
 
-        bestDisplay.textContent =
-            bestScore;
+    initAudio();
 
+    setTimeout(() => {
+        playNewRecordSound();
+    }, 50);
 
-        message.textContent =
-            `🎉 NEW RECORD! ${score} taps!`;
+} else {
 
-    } else {
+    message.textContent =
+        `Game Over! ${score} taps.`;
 
-        message.textContent =
-            `Game Over! ${score} taps.`;
+    playGameOverSound();
 
-    }
+}
 
 
     shareButton.style.display =
@@ -258,25 +630,46 @@ async function endGame() {
 async function submitScore() {
 
     let playerName =
-        prompt(
-            "Enter your nickname for today's leaderboard:"
+        localStorage.getItem(
+            "tapRushPlayerName"
         );
 
 
-    if (!playerName) {
-        return;
-    }
-
-
-    // Clean nickname
-    playerName =
-        playerName
-            .trim()
-            .substring(0, 20);
-
+    // ========================================
+    // ASK FOR NAME ONLY FIRST TIME
+    // ========================================
 
     if (!playerName) {
-        return;
+
+        playerName =
+            prompt(
+                "Enter your nickname for today's leaderboard:"
+            );
+
+
+        if (!playerName) {
+            return;
+        }
+
+
+        // Clean nickname
+        playerName =
+            playerName
+                .trim()
+                .substring(0, 20);
+
+
+        if (!playerName) {
+            return;
+        }
+
+
+        // Save nickname
+        localStorage.setItem(
+            "tapRushPlayerName",
+            playerName
+        );
+
     }
 
 
@@ -446,7 +839,9 @@ async function submitScore() {
     // SHOW PLAYER RANK
     // ========================================
 
-    await showPlayerRank(playerName);
+    await showPlayerRank(
+        playerName
+    );
 }
 
 
@@ -508,7 +903,8 @@ async function loadLeaderboard() {
     }
 
 
-    leaderboardList.innerHTML = "";
+    leaderboardList.innerHTML =
+        "";
 
 
     // ========================================
@@ -554,7 +950,9 @@ async function loadLeaderboard() {
             row.innerHTML = `
                 <span>
                     ${rank}
-                    ${escapeHTML(player.player_name)}
+                    ${escapeHTML(
+                        player.player_name
+                    )}
                 </span>
 
                 <strong>
@@ -576,7 +974,9 @@ async function loadLeaderboard() {
 // SHOW PLAYER'S CURRENT RANK
 // ========================================
 
-async function showPlayerRank(playerName) {
+async function showPlayerRank(
+    playerName
+) {
 
     const {
         data,
@@ -633,9 +1033,8 @@ async function showPlayerRank(playerName) {
         playerIndex + 1;
 
 
-    message.textContent =
-        `🏆 You're #${rank} today!`;
-
+   message.textContent =
+    `🏆 You're #${rank} today with ${score} taps!`;
 }
 
 

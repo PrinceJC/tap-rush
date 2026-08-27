@@ -1,3 +1,8 @@
+/* ========================================
+   TAP RUSH
+   MODERN GAME DESIGN
+======================================== */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -5,219 +10,439 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-
     min-height: 100vh;
+    font-family: Arial, sans-serif;
+
+    background:
+        radial-gradient(circle at top, #252552, #0d0d1c 65%);
+
+    color: white;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    user-select: none;
+    padding: 20px;
+
+    overflow-x: hidden;
 }
 
-/* MAIN GAME AREA */
+
+/* ========================================
+   GAME CONTAINER
+======================================== */
 
 .game-container {
     width: 100%;
-    max-width: 480px;
-
-    padding: 20px;
-}
-
-/* GAME CARD */
-
-.game-card {
-    background: white;
-
-    border-radius: 25px;
-
-    padding: 30px 20px;
+    max-width: 500px;
 
     text-align: center;
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.10);
 }
 
-/* TITLE */
+
+/* ========================================
+   TITLE
+======================================== */
 
 h1 {
-    font-size: 42px;
+    font-size: 3rem;
+    font-weight: 900;
 
-    margin-bottom: 8px;
+    letter-spacing: 3px;
+
+    margin-bottom: 5px;
+
+    text-shadow:
+        0 0 10px rgba(255, 255, 255, 0.4);
 }
 
-/* INSTRUCTIONS */
-
-.instructions {
-    font-size: 17px;
-
+.subtitle {
+    opacity: 0.7;
     margin-bottom: 25px;
 }
 
-/* SCORE AREA */
 
-.game-info {
+/* ========================================
+   SCORE AREA
+======================================== */
+
+.score-board {
     display: flex;
 
-    justify-content: space-around;
+    justify-content: space-between;
 
-    margin-bottom: 30px;
+    gap: 10px;
+
+    margin-bottom: 20px;
 }
 
-.game-info div {
-    display: flex;
+.score-box {
+    flex: 1;
 
-    flex-direction: column;
+    background: rgba(255, 255, 255, 0.08);
 
-    gap: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 18px;
+
+    padding: 15px 10px;
+
+    backdrop-filter: blur(10px);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.25);
 }
 
-.game-info span {
-    font-size: 13px;
+.score-label {
+    display: block;
+
+    font-size: 0.75rem;
 
     text-transform: uppercase;
 
     letter-spacing: 1px;
+
+    opacity: 0.6;
+
+    margin-bottom: 5px;
 }
 
-.game-info strong {
-    font-size: 30px;
+.score-value {
+    font-size: 2rem;
+
+    font-weight: 900;
 }
 
-/* TAP BUTTON */
 
-.tap-button {
-    width: min(70vw, 280px);
+/* ========================================
+   GAME AREA
+======================================== */
 
-    height: min(70vw, 280px);
+.game-area {
+    position: relative;
+
+    margin: 20px 0;
+}
+
+
+/* ========================================
+   TAP BUTTON
+======================================== */
+
+#tapButton {
+    width: 220px;
+    height: 220px;
 
     border: none;
 
     border-radius: 50%;
 
-    font-size: 42px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 
-    font-weight: bold;
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #ffffff,
+            #ddddff 25%,
+            #7d6cff 60%,
+            #4a3aff
+        );
+
+    color: #15152b;
+
+    font-size: 2rem;
+
+    font-weight: 900;
 
     cursor: pointer;
 
-    touch-action: manipulation;
+    box-shadow:
+        0 0 0 10px rgba(125, 108, 255, 0.15),
+        0 0 50px rgba(125, 108, 255, 0.5),
+        inset 0 -15px 25px rgba(0, 0, 0, 0.15);
 
-    transition: transform 0.08s;
+    transition:
+        transform 0.08s ease,
+        box-shadow 0.08s ease;
 }
 
-/* TAP ANIMATION */
 
-.tap-button:active {
-    transform: scale(0.92);
+/* ========================================
+   TAP ANIMATION
+======================================== */
+
+#tapButton:active {
+    transform: scale(0.90);
+
+    box-shadow:
+        0 0 0 5px rgba(125, 108, 255, 0.2),
+        0 0 25px rgba(125, 108, 255, 0.4),
+        inset 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* DISABLED TAP BUTTON */
 
-.tap-button:disabled {
-    opacity: 0.5;
+/* ========================================
+   PULSE ANIMATION
+======================================== */
+
+@keyframes pulse {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.04);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+#tapButton:not(:disabled) {
+    animation: pulse 1.5s infinite;
+}
+
+
+/* ========================================
+   DISABLED BUTTON
+======================================== */
+
+#tapButton:disabled {
+    opacity: 0.35;
 
     cursor: not-allowed;
+
+    animation: none;
 }
 
-/* START BUTTON */
 
-.start-button {
-    display: block;
+/* ========================================
+   START BUTTON
+======================================== */
 
-    margin: 25px auto 0;
-
-    padding: 15px 35px;
-
+#startButton {
     border: none;
+
+    padding: 14px 30px;
 
     border-radius: 12px;
 
-    font-size: 18px;
+    background: white;
 
-    font-weight: bold;
+    color: #15152b;
+
+    font-size: 1rem;
+
+    font-weight: 800;
 
     cursor: pointer;
 
-    touch-action: manipulation;
+    transition:
+        transform 0.15s ease,
+        opacity 0.15s ease;
 }
 
-/* START BUTTON CLICK */
-
-.start-button:active {
-    transform: scale(0.96);
+#startButton:hover {
+    transform: translateY(-2px);
 }
 
-/* DISABLED START BUTTON */
+#startButton:active {
+    transform: scale(0.95);
+}
 
-.start-button:disabled {
+#startButton:disabled {
     opacity: 0.5;
 
     cursor: not-allowed;
 }
 
-/* GAME MESSAGE */
+
+/* ========================================
+   MESSAGE
+======================================== */
 
 #message {
     min-height: 30px;
 
-    margin-top: 20px;
+    margin: 18px 0;
 
-    font-size: 18px;
+    font-weight: 700;
 
-    font-weight: bold;
+    font-size: 1.05rem;
 }
 
-/* SHARE BUTTON */
 
-.share-button {
-    margin: 15px auto 0;
+/* ========================================
+   SHARE BUTTON
+======================================== */
 
-    padding: 14px 25px;
-
+#shareButton {
     border: none;
+
+    padding: 12px 24px;
 
     border-radius: 12px;
 
-    font-size: 17px;
+    background: rgba(255, 255, 255, 0.1);
 
-    font-weight: bold;
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
 
     cursor: pointer;
 
-    touch-action: manipulation;
+    font-weight: 700;
+
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease;
 }
 
-/* SHARE BUTTON CLICK */
+#shareButton:hover {
+    background: rgba(255, 255, 255, 0.18);
 
-.share-button:active {
-    transform: scale(0.96);
+    transform: translateY(-2px);
 }
 
-/* MOBILE SCREEN */
 
-@media (max-width: 400px) {
+/* ========================================
+   LEADERBOARD
+======================================== */
 
-    .game-container {
+.leaderboard {
+    margin-top: 30px;
+
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    border-radius: 20px;
+
+    backdrop-filter: blur(10px);
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.leaderboard h2 {
+    margin-bottom: 5px;
+
+    font-size: 1.3rem;
+}
+
+#challengeDate {
+    opacity: 0.55;
+
+    font-size: 0.85rem;
+
+    margin-bottom: 15px;
+}
+
+
+/* ========================================
+   LEADERBOARD ROW
+======================================== */
+
+.leaderboard-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 12px 10px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    font-weight: 700;
+}
+
+.leaderboard-row:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-row strong {
+    font-size: 1.1rem;
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 480px) {
+
+    body {
         padding: 15px;
     }
 
-    .game-card {
-        padding: 25px 15px;
-    }
-
     h1 {
-        font-size: 34px;
+        font-size: 2.4rem;
     }
 
-    .instructions {
-        font-size: 15px;
+    #tapButton {
+        width: 190px;
+        height: 190px;
+function tap() {
+
+    if (!gameRunning) {
+        return;
     }
 
-    .game-info strong {
-        font-size: 26px;
+    score++;
+
+    scoreDisplay.textContent =
+        score;
+}
+        font-size: 1.7rem;
+    }
+
+    .score-value {
+        font-size: 1.6rem;
+    }
+
+}
+
+/* ========================================
+   TAP +1 EFFECT
+======================================== */
+
+.game-area {
+    position: relative;
+}
+
+.tap-effect {
+    position: absolute;
+
+    transform: translate(-50%, -50%);
+
+    font-size: 1.5rem;
+
+    font-weight: 900;
+
+    pointer-events: none;
+
+    animation: tapFloat 0.7s ease-out forwards;
+
+    z-index: 10;
+}
+
+@keyframes tapFloat {
+
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -20%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -120px) scale(1.4);
     }
 }
