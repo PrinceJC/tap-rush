@@ -1,74 +1,98 @@
 // ========================================
-// TAP RUSH - GAME LOGIC
+// TAP RUSH
 // ========================================
 
-// Game variables
+
+// ========================================
+// SUPABASE
+// ========================================
+
+const SUPABASE_URL =
+    "https://ihjmbcljsppcabnprvcl.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_Kl_qSSKNGYVlGMwRR7PiZA_RstX8Ug9";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+// ========================================
+// GAME VARIABLES
+// ========================================
+
 let score = 0;
 let timeLeft = 10;
 let gameRunning = false;
-let timer;
-
-// Get saved best score from the browser
-let bestScore = localStorage.getItem("tapRushBest") || 0;
+let timer = null;
 
 
 // ========================================
-// GET HTML ELEMENTS
+// PERSONAL BEST
 // ========================================
 
-const scoreDisplay = document.getElementById("score");
-const timeDisplay = document.getElementById("time");
-const bestDisplay = document.getElementById("best");
-
-const tapButton = document.getElementById("tapButton");
-const startButton = document.getElementById("startButton");
-const shareButton = document.getElementById("shareButton");
-
-const message = document.getElementById("message");
+let bestScore =
+    Number(localStorage.getItem("tapRushBest")) || 0;
 
 
 // ========================================
-// INITIAL SETUP
+// HTML ELEMENTS
 // ========================================
 
-// Show saved best score
+const scoreDisplay =
+    document.getElementById("score");
+
+const timeDisplay =
+    document.getElementById("time");
+
+const bestDisplay =
+    document.getElementById("best");
+
+const startButton =
+    document.getElementById("startButton");
+
+const tapButton =
+    document.getElementById("tapButton");
+
+const shareButton =
+    document.getElementById("shareButton");
+
+const message =
+    document.getElementById("message");
+
+const leaderboardList =
+    document.getElementById("leaderboardList");
+
+
+// ========================================
+// INITIAL DISPLAY
+// ========================================
+
 bestDisplay.textContent = bestScore;
 
-// Disable TAP button before game starts
-tapButton.disabled = true;
-
 
 // ========================================
-// BUTTON EVENTS
+// BUTTONS
 // ========================================
 
-// Start Game
-startButton.addEventListener("click", startGame);
+startButton.addEventListener(
+    "click",
+    startGame
+);
 
-// TAP
-tapButton.addEventListener("click", tap);
+tapButton.addEventListener(
+    "click",
+    tap
+);
 
-// Share Score
-shareButton.addEventListener("click", shareScore);
-
-
-// ========================================
-// TAP FUNCTION
-// ========================================
-
-function tap() {
-
-    // Don't allow tapping when game isn't running
-    if (!gameRunning) {
-        return;
-    }
-
-    // Increase score
-    score++;
-
-    // Update score
-    scoreDisplay.textContent = score;
-}
+shareButton.addEventListener(
+    "click",
+    shareScore
+);
 
 
 // ========================================
@@ -77,39 +101,36 @@ function tap() {
 
 function startGame() {
 
-    // Reset game
     score = 0;
+
     timeLeft = 10;
+
     gameRunning = true;
 
-    // Reset screen
+
     scoreDisplay.textContent = score;
+
     timeDisplay.textContent = timeLeft;
 
-    // Clear previous message
+
     message.textContent = "";
 
-    // Hide share button
-    shareButton.style.display = "none";
 
-    // Enable TAP button
-    tapButton.disabled = false;
-
-    // Disable Start button
     startButton.disabled = true;
 
+    tapButton.disabled = false;
 
-    // ========================================
-    // COUNTDOWN
-    // ========================================
+    shareButton.style.display = "none";
+
 
     timer = setInterval(() => {
 
         timeLeft--;
 
-        timeDisplay.textContent = timeLeft;
+        timeDisplay.textContent =
+            timeLeft;
 
-        // End game at zero
+
         if (timeLeft <= 0) {
 
             endGame();
@@ -121,74 +142,287 @@ function startGame() {
 
 
 // ========================================
+// TAP
+// ========================================
+
+function tap() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    score++;
+
+
+    scoreDisplay.textContent =
+        score;
+}
+
+
+// ========================================
 // END GAME
 // ========================================
 
-function endGame() {
+async function endGame() {
 
-    // Stop game
     gameRunning = false;
 
-    // Stop countdown
+
     clearInterval(timer);
 
-    // Disable TAP button
+
     tapButton.disabled = true;
 
-    // Enable Start button
     startButton.disabled = false;
 
 
-    // ========================================
-    // CHECK BEST SCORE
-    // ========================================
+    // PERSONAL BEST
 
     if (score > bestScore) {
 
-        // Save new record
         bestScore = score;
+
 
         localStorage.setItem(
             "tapRushBest",
             bestScore
         );
 
-        // Update Best Score
-        bestDisplay.textContent = bestScore;
 
-        // Show new record
+        bestDisplay.textContent =
+            bestScore;
+
+
         message.textContent =
             `🎉 NEW RECORD! ${score} taps!`;
 
     } else {
 
-        // Normal game over
         message.textContent =
-            `Game Over! You scored ${score} taps. Best: ${bestScore}`;
+            `Game Over! ${score} taps.`;
 
     }
 
 
-    // Show Share button
-    shareButton.style.display = "block";
+    shareButton.style.display =
+        "block";
+
+
+    // SUBMIT SCORE
+
+    await submitScore();
+
 }
 
 
 // ========================================
-// SHARE SCORE
+// SUBMIT SCORE TO SUPABASE
+// ========================================
+
+async function submitScore() {
+
+    let playerName =
+        prompt(
+            "Enter your nickname for the leaderboard:"
+        );
+
+
+    if (!playerName) {
+
+        return;
+
+    }
+
+
+    playerName =
+        playerName
+            .trim()
+            .substring(0, 20);
+
+
+    if (!playerName) {
+
+        return;
+
+    }
+
+
+    console.log(
+        "Submitting score...",
+        playerName,
+        score
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("leaderboard")
+            .insert([
+                {
+                    player_name:
+                        playerName,
+
+                    score:
+                        score
+                }
+            ]);
+
+
+    if (error) {
+
+        console.error(
+            "SUPABASE ERROR:",
+            error
+        );
+
+
+        alert(
+            "Could not submit score. Check the browser console."
+        );
+
+
+        return;
+
+    }
+
+
+    console.log(
+        "Score submitted successfully!",
+        data
+    );
+
+
+    loadLeaderboard();
+
+}
+
+
+// ========================================
+// LOAD LEADERBOARD
+// ========================================
+
+async function loadLeaderboard() {
+
+    leaderboardList.innerHTML =
+        "Loading leaderboard...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("leaderboard")
+            .select(
+                "player_name, score, created_at"
+            )
+            .order(
+                "score",
+                {
+                    ascending: false
+                }
+            )
+            .limit(10);
+
+
+    if (error) {
+
+        console.error(
+            "LEADERBOARD ERROR:",
+            error
+        );
+
+
+        leaderboardList.innerHTML =
+            "Unable to load leaderboard.";
+
+        return;
+
+    }
+
+
+    if (!data || data.length === 0) {
+
+        leaderboardList.innerHTML =
+            "No scores yet. Be the first!";
+
+        return;
+
+    }
+
+
+    leaderboardList.innerHTML =
+        "";
+
+
+    data.forEach(
+        (player, index) => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "leaderboard-row";
+
+
+            row.innerHTML = `
+                <span>
+                    ${index + 1}. 
+                    ${escapeHTML(player.player_name)}
+                </span>
+
+                <strong>
+                    ${player.score}
+                </strong>
+            `;
+
+
+            leaderboardList.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+// ========================================
+// SECURITY
+// ========================================
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+
+// ========================================
+// SHARE
 // ========================================
 
 async function shareScore() {
 
-    const shareText =
+    const text =
         `🔥 I scored ${score} taps on Tap Rush! Can you beat me?`;
 
-    const shareUrl = window.location.href;
 
+    const url =
+        window.location.href;
 
-    // ========================================
-    // OPTION 1: NATIVE PHONE SHARING
-    // ========================================
 
     if (navigator.share) {
 
@@ -196,66 +430,62 @@ async function shareScore() {
 
             await navigator.share({
 
-                title: "Tap Rush",
+                title:
+                    "Tap Rush",
 
-                text: shareText,
+                text:
+                    text,
 
-                url: shareUrl
+                url:
+                    url
 
             });
+
 
             return;
 
         } catch (error) {
 
-            // User cancelled the share menu
-            if (error.name === "AbortError") {
+            if (
+                error.name ===
+                "AbortError"
+            ) {
+
                 return;
+
             }
 
-            console.log(
-                "Native sharing failed:",
-                error
-            );
         }
+
     }
 
-
-    // ========================================
-    // OPTION 2: CLIPBOARD
-    // ========================================
 
     try {
 
-        if (navigator.clipboard) {
+        await navigator.clipboard.writeText(
+            `${text}\n${url}`
+        );
 
-            await navigator.clipboard.writeText(
-                `${shareText}\n${shareUrl}`
-            );
 
-            alert("Share message copied!");
+        alert(
+            "Share message copied!"
+        );
 
-            return;
-        }
 
     } catch (error) {
 
-        console.log(
-            "Clipboard failed:",
-            error
+        prompt(
+            "Copy this message:",
+            `${text}\n${url}`
         );
+
     }
 
-
-    // ========================================
-    // OPTION 3: MANUAL COPY
-    // ========================================
-
-    const textToShare =
-        `${shareText}\n${shareUrl}`;
-
-    prompt(
-        "Copy this message and share it with your friends:",
-        textToShare
-    );
 }
+
+
+// ========================================
+// LOAD LEADERBOARD WHEN GAME OPENS
+// ========================================
+
+loadLeaderboard();

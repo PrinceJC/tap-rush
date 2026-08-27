@@ -1,99 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Tap Rush</title>
 
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
-    <main class="game-container">
+    <div class="game-container">
 
-        <div class="game-card">
+        <h1>⚡ TAP RUSH</h1>
 
-            <h1>Tap Rush</h1>
+        <p>Tap as fast as you can!</p>
 
-            <p class="instructions">
-                Tap as fast as you can!
-            </p>
+        <div class="stats">
 
-            <!-- GAME INFORMATION -->
-
-            <div class="game-info">
-
-                <div>
-                    <span>Time</span>
-                    <strong id="time">10</strong>
-                </div>
-
-                <div>
-                    <span>Score</span>
-                    <strong id="score">0</strong>
-                </div>
-
-                <div>
-                    <span>Best</span>
-                    <strong id="best">0</strong>
-                </div>
-
+            <div class="stat">
+                <span>TIME</span>
+                <strong id="time">10</strong>
             </div>
 
+            <div class="stat">
+                <span>SCORE</span>
+                <strong id="score">0</strong>
+            </div>
 
-            <!-- TAP BUTTON -->
-
-            <button
-                id="tapButton"
-                class="tap-button"
-            >
-                TAP!
-            </button>
-
-
-            <!-- START / PLAY AGAIN -->
-
-            <button
-                id="startButton"
-                class="start-button"
-            >
-                Start Game
-            </button>
-
-
-            <!-- GAME MESSAGE -->
-
-            <p id="message"></p>
-
-
-            <!-- SHARE BUTTON -->
-
-            <button
-                id="shareButton"
-                class="share-button"
-                style="display: none;"
-            >
-                📤 Share My Score
-            </button>
+            <div class="stat">
+                <span>BEST</span>
+                <strong id="best">0</strong>
+            </div>
 
         </div>
 
-    </main>
+
+        <button id="startButton" class="start-button">
+            START GAME
+        </button>
 
 
-    <!-- JAVASCRIPT -->
+        <button id="tapButton" class="tap-button" disabled>
+            TAP!
+        </button>
 
+
+        <div id="message" class="message"></div>
+
+
+        <button id="shareButton" class="share-button" style="display:none;">
+            📤 SHARE SCORE
+        </button>
+
+
+        <div class="leaderboard">
+
+            <h2>🏆 GLOBAL LEADERBOARD</h2>
+
+            <div id="leaderboardList">
+                Loading leaderboard...
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Game -->
     <script src="game.js"></script>
 
 </body>
-
 </html>
