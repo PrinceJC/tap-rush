@@ -301,24 +301,28 @@ function tap() {
         if (
             combo === 5 ||
             combo === 10 ||
-            combo === 20
-        ) {
+            combo === 20 ||
+            combo === 50 ||
+            combo === 100 ||
+            combo === 200 
+        )  {
 
-            comboDisplay.classList.remove(
-                "combo-milestone"
-            );
+    if (comboDisplay) {
 
+        comboDisplay.classList.remove(
+            "combo-milestone"
+        );
 
-            // Force browser to restart animation
+        void comboDisplay.offsetWidth;
 
-            void comboDisplay.offsetWidth;
+        comboDisplay.classList.add(
+            "combo-milestone"
+        );
 
+    }
 
-            comboDisplay.classList.add(
-                "combo-milestone"
-            );
-
-        }
+    playComboSound(combo);
+}
 
     }
 
@@ -375,6 +379,162 @@ function tap() {
 
     playTapSound();
 
+}
+// ========================================
+// COMBO MILESTONE SOUNDS
+// ========================================
+
+function playComboSound(comboLevel) {
+
+    try {
+
+        initAudio();
+
+        if (!audioContext) {
+            return;
+        }
+
+        const now =
+            audioContext.currentTime;
+
+        // ========================================
+        // X5 - SMALL COMBO
+        // ========================================
+
+        if (comboLevel === 5) {
+
+            const oscillator =
+                audioContext.createOscillator();
+
+            const gain =
+                audioContext.createGain();
+
+            oscillator.type = "sine";
+
+            oscillator.frequency.setValueAtTime(
+                700,
+                now
+            );
+
+            oscillator.frequency.exponentialRampToValueAtTime(
+                1000,
+                now + 0.15
+            );
+
+            gain.gain.setValueAtTime(
+                0.08,
+                now
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                now + 0.15
+            );
+
+            oscillator.connect(gain);
+
+            gain.connect(
+                audioContext.destination
+            );
+
+            oscillator.start(now);
+
+            oscillator.stop(
+                now + 0.15
+            );
+        }
+
+
+        // ========================================
+        // X10 - BIGGER COMBO
+        // ========================================
+
+        if (comboLevel === 10) {
+
+            playTone(700, 0.12);
+            playTone(900, 0.12, 0.12);
+            playTone(1200, 0.18, 0.24);
+        }
+
+
+        // ========================================
+        // X20 - MAJOR COMBO
+        // ========================================
+
+        if (comboLevel === 20) {
+
+            playTone(600, 0.12);
+            playTone(800, 0.12, 0.12);
+            playTone(1000, 0.12, 0.24);
+            playTone(1400, 0.25, 0.36);
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Combo sound error:",
+            error
+        );
+
+    }
+}
+
+
+// ========================================
+// COMBO TONE HELPER
+// ========================================
+
+function playTone(
+    frequency,
+    duration,
+    delay = 0
+) {
+
+    if (!audioContext) {
+        return;
+    }
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    const startTime =
+        audioContext.currentTime +
+        delay;
+
+    oscillator.type =
+        "sine";
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        startTime
+    );
+
+    gain.gain.setValueAtTime(
+        0.08,
+        startTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        startTime + duration
+    );
+
+    oscillator.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+    oscillator.start(
+        startTime
+    );
+
+    oscillator.stop(
+        startTime + duration
+    );
 }
 
 // ========================================
