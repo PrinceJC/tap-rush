@@ -435,8 +435,18 @@ async function submitScore() {
     }
 
 
-    // Refresh leaderboard
-    loadLeaderboard();
+    // ========================================
+    // REFRESH LEADERBOARD
+    // ========================================
+
+    await loadLeaderboard();
+
+
+    // ========================================
+    // SHOW PLAYER RANK
+    // ========================================
+
+    await showPlayerRank(playerName);
 }
 
 
@@ -559,6 +569,73 @@ async function loadLeaderboard() {
 
         }
     );
+}
+
+
+// ========================================
+// SHOW PLAYER'S CURRENT RANK
+// ========================================
+
+async function showPlayerRank(playerName) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("leaderboard")
+            .select(
+                "player_name, score"
+            )
+            .eq(
+                "challenge_date",
+                today
+            )
+            .order(
+                "score",
+                {
+                    ascending: false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Rank error:",
+            error
+        );
+
+
+        return;
+    }
+
+
+    if (!data) {
+        return;
+    }
+
+
+    const playerIndex =
+        data.findIndex(
+            player =>
+                player.player_name.toLowerCase() ===
+                playerName.toLowerCase()
+        );
+
+
+    if (playerIndex === -1) {
+        return;
+    }
+
+
+    const rank =
+        playerIndex + 1;
+
+
+    message.textContent =
+        `🏆 You're #${rank} today!`;
+
 }
 
 
